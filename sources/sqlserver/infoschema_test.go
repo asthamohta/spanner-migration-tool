@@ -343,7 +343,7 @@ func TestProcessSchema(t *testing.T) {
 			},
 			PrimaryKeys: []ddl.IndexKey{{ColId: "ref_id", Order: 1}, {ColId: "ref_txt", Order: 2}}},
 	}
-	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema))
+	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 
 	cartTableId, err := internal.GetTableIdFromSpName(conv.SpSchema, "cart")
 	assert.Equal(t, nil, err)

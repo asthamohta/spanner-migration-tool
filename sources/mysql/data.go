@@ -90,17 +90,17 @@ func ConvertData(conv *internal.Conv, tableId string, colIds []string, srcSchema
 		c = append(c, spCol)
 	}
 	if aux, ok := conv.SyntheticPKeys[tableId]; ok {
-		c = append(c, conv.SpSchema[tableId].ColDefs[aux.ColId].Name)
+		c = append(c, conv.SpSchema.Tables[tableId].ColDefs[aux.ColId].Name)
 		v = append(v, fmt.Sprintf("%d", int64(bits.Reverse64(uint64(aux.Sequence)))))
 		aux.Sequence++
 		conv.SyntheticPKeys[tableId] = aux
 	}
-	colId := conv.SpSchema[tableId].ShardIdColumn
+	colId := conv.SpSchema.Tables[tableId].ShardIdColumn
 	if colId != "" {
-		c = append(c, conv.SpSchema[tableId].ColDefs[colId].Name)
+		c = append(c, conv.SpSchema.Tables[tableId].ColDefs[colId].Name)
 		v = append(v, additionalAttributes.ShardId)
 	}
-	return conv.SpSchema[tableId].Name, c, v, nil
+	return conv.SpSchema.Tables[tableId].Name, c, v, nil
 }
 
 // convScalar converts a source database string value to an

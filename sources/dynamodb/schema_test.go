@@ -211,7 +211,7 @@ func TestProcessSchema(t *testing.T) {
 				"d": {Name: "d", T: ddl.Type{Name: "STRING", Len: ddl.MaxLength, IsArray: false}, NotNull: false, Comment: ""}},
 			PrimaryKeys: []ddl.IndexKey{{ColId: "a", Desc: false, Order: 1}, {ColId: "b", Desc: false, Order: 2}},
 		}}
-	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema))
+	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 	assert.Equal(t, int64(0), conv.Unexpecteds())
 }
 
@@ -313,7 +313,7 @@ func TestProcessSchema_FullDataTypes(t *testing.T) {
 			PrimaryKeys: []ddl.IndexKey{{ColId: "a", Order: 1}, {ColId: "b", Order: 2}},
 		},
 	}
-	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema))
+	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 	assert.Equal(t, int64(0), conv.Unexpecteds())
 }
 

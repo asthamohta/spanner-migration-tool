@@ -62,10 +62,10 @@ func ConvertData(conv *internal.Conv, tableId string, colIds []string, vals []st
 	// repeated for every row converted. If this becomes a
 	// performance issue, we could consider moving this block of
 	// code to the callers of ConverData to avoid the redundancy.
-	spSchema, ok1 := conv.SpSchema[tableId]
+	spSchema, ok1 := conv.SpSchema.Tables[tableId]
 	srcSchema, ok2 := conv.SrcSchema[tableId]
 	if !ok1 || !ok2 {
-		return "", []string{}, []interface{}{}, fmt.Errorf("can't find table %s in schema", conv.SpSchema[tableId].Name)
+		return "", []string{}, []interface{}{}, fmt.Errorf("can't find table %s in schema", conv.SpSchema.Tables[tableId].Name)
 	}
 	var c []string
 	var v []interface{}
@@ -98,7 +98,7 @@ func ConvertData(conv *internal.Conv, tableId string, colIds []string, vals []st
 		c = append(c, spColDef.Name)
 	}
 	if aux, ok := conv.SyntheticPKeys[tableId]; ok {
-		c = append(c, conv.SpSchema[tableId].ColDefs[aux.ColId].Name)
+		c = append(c, conv.SpSchema.Tables[tableId].ColDefs[aux.ColId].Name)
 		v = append(v, fmt.Sprintf("%d", int64(bits.Reverse64(uint64(aux.Sequence)))))
 		aux.Sequence++
 		conv.SyntheticPKeys[tableId] = aux

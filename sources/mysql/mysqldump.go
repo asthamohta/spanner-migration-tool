@@ -750,8 +750,8 @@ func processInsertStmt(conv *internal.Conv, stmt *ast.InsertStmt) {
 		logStmtError(conv, stmt, fmt.Errorf("can't get column values"))
 		return
 	}
-	commonColIds := common.IntersectionOfTwoStringSlices(conv.SpSchema[tableId].ColIds, srcColIds)
-	spSchema := conv.SpSchema[tableId]
+	commonColIds := common.IntersectionOfTwoStringSlices(conv.SpSchema.Tables[tableId].ColIds, srcColIds)
+	spSchema := conv.SpSchema.Tables[tableId]
 	colNameIdMap := internal.GetSrcColNameIdMap(conv.SrcSchema[tableId])
 	for _, row := range stmt.Lists {
 		values, err = getVals(row)

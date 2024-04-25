@@ -354,41 +354,43 @@ func TestPrintForeignKey(t *testing.T) {
 }
 
 func TestPrintForeignKeyAlterTable(t *testing.T) {
-	spannerSchema := map[string]CreateTable{
-		"t1": CreateTable{
-			Name:   "table1",
-			ColIds: []string{"c1", "c2", "c3"},
-			ColDefs: map[string]ColumnDef{
-				"c1": ColumnDef{Name: "productid", T: Type{Name: String, Len: MaxLength}},
-				"c2": ColumnDef{Name: "userid", T: Type{Name: String, Len: MaxLength}},
-				"c3": ColumnDef{Name: "quantity", T: Type{Name: Int64}},
-			},
-			ForeignKeys: []Foreignkey{
-				{
-					"fk_test",
-					[]string{"c1", "c2"},
-					"t2",
-					[]string{"c4", "c5"},
-					"f1",
+	spannerSchema := Schema{
+		Tables: map[string]CreateTable{
+			"t1": CreateTable{
+				Name:   "table1",
+				ColIds: []string{"c1", "c2", "c3"},
+				ColDefs: map[string]ColumnDef{
+					"c1": ColumnDef{Name: "productid", T: Type{Name: String, Len: MaxLength}},
+					"c2": ColumnDef{Name: "userid", T: Type{Name: String, Len: MaxLength}},
+					"c3": ColumnDef{Name: "quantity", T: Type{Name: Int64}},
 				},
-				{
-					"",
-					[]string{"c1"},
-					"t2",
-					[]string{"c4"},
-					"f2",
+				ForeignKeys: []Foreignkey{
+					{
+						"fk_test",
+						[]string{"c1", "c2"},
+						"t2",
+						[]string{"c4", "c5"},
+						"f1",
+					},
+					{
+						"",
+						[]string{"c1"},
+						"t2",
+						[]string{"c4"},
+						"f2",
+					},
 				},
 			},
-		},
 
-		"t2": CreateTable{
-			Name:   "table2",
-			ColIds: []string{"c4", "c5"},
-			ColDefs: map[string]ColumnDef{
-				"c4": ColumnDef{Name: "productid", T: Type{Name: String, Len: MaxLength}},
-				"c5": ColumnDef{Name: "userid", T: Type{Name: String, Len: MaxLength}},
-			},
-		}}
+			"t2": CreateTable{
+				Name:   "table2",
+				ColIds: []string{"c4", "c5"},
+				ColDefs: map[string]ColumnDef{
+					"c4": ColumnDef{Name: "productid", T: Type{Name: String, Len: MaxLength}},
+					"c5": ColumnDef{Name: "userid", T: Type{Name: String, Len: MaxLength}},
+				},
+			}},
+		}
 
 	tests := []struct {
 		name       string
@@ -398,10 +400,10 @@ func TestPrintForeignKeyAlterTable(t *testing.T) {
 		expected   string
 		fk         Foreignkey
 	}{
-		{"no quote", "t1", false, "", "ALTER TABLE table1 ADD CONSTRAINT fk_test FOREIGN KEY (productid, userid) REFERENCES table2 (productid, userid)", spannerSchema["t1"].ForeignKeys[0]},
-		{"quote", "t1", true, "", "ALTER TABLE `table1` ADD CONSTRAINT `fk_test` FOREIGN KEY (productid, userid) REFERENCES `table2` (productid, userid)", spannerSchema["t1"].ForeignKeys[0]},
-		{"no constraint name", "t1", false, "", "ALTER TABLE table1 ADD FOREIGN KEY (productid) REFERENCES table2 (productid)", spannerSchema["t1"].ForeignKeys[1]},
-		{"quote PG", "t1", true, constants.DIALECT_POSTGRESQL, "ALTER TABLE table1 ADD CONSTRAINT fk_test FOREIGN KEY (productid, userid) REFERENCES table2 (productid, userid)", spannerSchema["t1"].ForeignKeys[0]},
+		{"no quote", "t1", false, "", "ALTER TABLE table1 ADD CONSTRAINT fk_test FOREIGN KEY (productid, userid) REFERENCES table2 (productid, userid)", spannerSchema.Tables["t1"].ForeignKeys[0]},
+		{"quote", "t1", true, "", "ALTER TABLE `table1` ADD CONSTRAINT `fk_test` FOREIGN KEY (productid, userid) REFERENCES `table2` (productid, userid)", spannerSchema.Tables["t1"].ForeignKeys[0]},
+		{"no constraint name", "t1", false, "", "ALTER TABLE table1 ADD FOREIGN KEY (productid) REFERENCES table2 (productid)", spannerSchema.Tables["t1"].ForeignKeys[1]},
+		{"quote PG", "t1", true, constants.DIALECT_POSTGRESQL, "ALTER TABLE table1 ADD CONSTRAINT fk_test FOREIGN KEY (productid, userid) REFERENCES table2 (productid, userid)", spannerSchema.Tables["t1"].ForeignKeys[0]},
 	}
 	for _, tc := range tests {
 		assert.Equal(t, tc.expected, tc.fk.PrintForeignKeyAlterTable(spannerSchema, Config{ProtectIds: tc.protectIds, SpDialect: tc.spDialect}, tc.table))
@@ -410,43 +412,45 @@ func TestPrintForeignKeyAlterTable(t *testing.T) {
 
 func TestGetDDL(t *testing.T) {
 	s := Schema{
-		"t1": CreateTable{
-			Name:   "table1",
-			Id:     "t1",
-			ColIds: []string{"c1", "c2"},
-			ColDefs: map[string]ColumnDef{
-				"c1": {Name: "a", Id: "c1", T: Type{Name: Int64}},
-				"c2": {Name: "b", Id: "c2", T: Type{Name: Int64}},
+		Tables: map[string]CreateTable{
+			"t1": CreateTable{
+				Name:   "table1",
+				Id:     "t1",
+				ColIds: []string{"c1", "c2"},
+				ColDefs: map[string]ColumnDef{
+					"c1": {Name: "a", Id: "c1", T: Type{Name: Int64}},
+					"c2": {Name: "b", Id: "c2", T: Type{Name: Int64}},
+				},
+				PrimaryKeys: []IndexKey{{ColId: "c1"}},
+				ForeignKeys: []Foreignkey{{Name: "fk1", ColIds: []string{"c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c5"}}},
+				Indexes:     []CreateIndex{{Name: "index1", TableId: "t1", Unique: false, Keys: []IndexKey{{ColId: "c2", Desc: false}}}},
 			},
-			PrimaryKeys: []IndexKey{{ColId: "c1"}},
-			ForeignKeys: []Foreignkey{{Name: "fk1", ColIds: []string{"c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c5"}}},
-			Indexes:     []CreateIndex{{Name: "index1", TableId: "t1", Unique: false, Keys: []IndexKey{{ColId: "c2", Desc: false}}}},
-		},
-		"t2": CreateTable{
-			Name:   "table2",
-			Id:     "t2",
-			ColIds: []string{"c4", "c5", "c6"},
-			ColDefs: map[string]ColumnDef{
-				"c4": {Name: "a", Id: "c4", T: Type{Name: Int64}},
-				"c5": {Name: "b", Id: "c5", T: Type{Name: Int64}},
-				"c6": {Name: "c", Id: "c6", T: Type{Name: Int64}},
+			"t2": CreateTable{
+				Name:   "table2",
+				Id:     "t2",
+				ColIds: []string{"c4", "c5", "c6"},
+				ColDefs: map[string]ColumnDef{
+					"c4": {Name: "a", Id: "c4", T: Type{Name: Int64}},
+					"c5": {Name: "b", Id: "c5", T: Type{Name: Int64}},
+					"c6": {Name: "c", Id: "c6", T: Type{Name: Int64}},
+				},
+				PrimaryKeys: []IndexKey{{ColId: "c4"}},
+				ForeignKeys: []Foreignkey{{Name: "fk2", ColIds: []string{"c5", "c6"}, ReferTableId: "t3", ReferColumnIds: []string{"c8", "c9"}}},
+				Indexes:     []CreateIndex{{Name: "index2", TableId: "t2", Unique: true, Keys: []IndexKey{{ColId: "c5", Desc: true}, {ColId: "c6", Desc: false}}}},
 			},
-			PrimaryKeys: []IndexKey{{ColId: "c4"}},
-			ForeignKeys: []Foreignkey{{Name: "fk2", ColIds: []string{"c5", "c6"}, ReferTableId: "t3", ReferColumnIds: []string{"c8", "c9"}}},
-			Indexes:     []CreateIndex{{Name: "index2", TableId: "t2", Unique: true, Keys: []IndexKey{{ColId: "c5", Desc: true}, {ColId: "c6", Desc: false}}}},
-		},
-		"t3": CreateTable{
-			Name:   "table3",
-			Id:     "t3",
-			ColIds: []string{"c7", "c8", "c9"},
-			ColDefs: map[string]ColumnDef{
-				"c7": {Name: "a", Id: "c7", T: Type{Name: Int64}},
-				"c8": {Name: "b", Id: "c8", T: Type{Name: Int64}},
-				"c9": {Name: "c", Id: "c9", T: Type{Name: Int64}},
+			"t3": CreateTable{
+				Name:   "table3",
+				Id:     "t3",
+				ColIds: []string{"c7", "c8", "c9"},
+				ColDefs: map[string]ColumnDef{
+					"c7": {Name: "a", Id: "c7", T: Type{Name: Int64}},
+					"c8": {Name: "b", Id: "c8", T: Type{Name: Int64}},
+					"c9": {Name: "c", Id: "c9", T: Type{Name: Int64}},
+				},
+				PrimaryKeys: []IndexKey{{ColId: "c7"}, {ColId: "c8"}},
+				ParentId:    "t1",
 			},
-			PrimaryKeys: []IndexKey{{ColId: "c7"}, {ColId: "c8"}},
-			ParentId:    "t1",
-		},
+		},	
 	}
 	tablesOnly := s.GetDDL(Config{Tables: true, ForeignKeys: false})
 	e := []string{
@@ -504,42 +508,44 @@ func TestGetDDL(t *testing.T) {
 
 func TestGetPGDDL(t *testing.T) {
 	s := Schema{
-		"t1": CreateTable{
-			Name:   "table1",
-			Id:     "t1",
-			ColIds: []string{"c1", "c2"},
-			ColDefs: map[string]ColumnDef{
-				"c1": {Name: "a", Id: "c1", T: Type{Name: Int64}},
-				"c2": {Name: "b", Id: "c2", T: Type{Name: Int64}},
+		Tables: map[string]CreateTable{
+			"t1": CreateTable{
+				Name:   "table1",
+				Id:     "t1",
+				ColIds: []string{"c1", "c2"},
+				ColDefs: map[string]ColumnDef{
+					"c1": {Name: "a", Id: "c1", T: Type{Name: Int64}},
+					"c2": {Name: "b", Id: "c2", T: Type{Name: Int64}},
+				},
+				PrimaryKeys: []IndexKey{{ColId: "c1"}},
+				ForeignKeys: []Foreignkey{{Name: "fk1", ColIds: []string{"c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c4"}}},
+				Indexes:     []CreateIndex{{Name: "index1", TableId: "t1", Unique: false, Keys: []IndexKey{{ColId: "c2", Desc: false}}}},
 			},
-			PrimaryKeys: []IndexKey{{ColId: "c1"}},
-			ForeignKeys: []Foreignkey{{Name: "fk1", ColIds: []string{"c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c4"}}},
-			Indexes:     []CreateIndex{{Name: "index1", TableId: "t1", Unique: false, Keys: []IndexKey{{ColId: "c2", Desc: false}}}},
-		},
-		"t2": CreateTable{
-			Name:   "table2",
-			Id:     "t2",
-			ColIds: []string{"c3", "c4", "c5"},
-			ColDefs: map[string]ColumnDef{
-				"c3": {Name: "a", Id: "c3", T: Type{Name: Int64}},
-				"c4": {Name: "b", Id: "c4", T: Type{Name: Int64}},
-				"c5": {Name: "c", Id: "c5", T: Type{Name: Int64}},
+			"t2": CreateTable{
+				Name:   "table2",
+				Id:     "t2",
+				ColIds: []string{"c3", "c4", "c5"},
+				ColDefs: map[string]ColumnDef{
+					"c3": {Name: "a", Id: "c3", T: Type{Name: Int64}},
+					"c4": {Name: "b", Id: "c4", T: Type{Name: Int64}},
+					"c5": {Name: "c", Id: "c5", T: Type{Name: Int64}},
+				},
+				PrimaryKeys: []IndexKey{{ColId: "c3"}},
+				ForeignKeys: []Foreignkey{{Name: "fk2", ColIds: []string{"c4", "c5"}, ReferTableId: "t3", ReferColumnIds: []string{"c7", "c8"}}},
+				Indexes:     []CreateIndex{{Name: "index2", TableId: "t2", Unique: true, Keys: []IndexKey{{ColId: "c4", Desc: true}, {ColId: "c5", Desc: false}}}},
 			},
-			PrimaryKeys: []IndexKey{{ColId: "c3"}},
-			ForeignKeys: []Foreignkey{{Name: "fk2", ColIds: []string{"c4", "c5"}, ReferTableId: "t3", ReferColumnIds: []string{"c7", "c8"}}},
-			Indexes:     []CreateIndex{{Name: "index2", TableId: "t2", Unique: true, Keys: []IndexKey{{ColId: "c4", Desc: true}, {ColId: "c5", Desc: false}}}},
-		},
-		"t3": CreateTable{
-			Name:   "table3",
-			Id:     "t3",
-			ColIds: []string{"c6", "c7", "c8"},
-			ColDefs: map[string]ColumnDef{
-				"c6": {Name: "a", Id: "c6", T: Type{Name: Int64}},
-				"c7": {Name: "b", Id: "c7", T: Type{Name: Int64}},
-				"c8": {Name: "c", Id: "c8", T: Type{Name: Int64}},
+			"t3": CreateTable{
+				Name:   "table3",
+				Id:     "t3",
+				ColIds: []string{"c6", "c7", "c8"},
+				ColDefs: map[string]ColumnDef{
+					"c6": {Name: "a", Id: "c6", T: Type{Name: Int64}},
+					"c7": {Name: "b", Id: "c7", T: Type{Name: Int64}},
+					"c8": {Name: "c", Id: "c8", T: Type{Name: Int64}},
+				},
+				PrimaryKeys: []IndexKey{{ColId: "c6"}, {ColId: "c7"}},
+				ParentId:    "t1",
 			},
-			PrimaryKeys: []IndexKey{{ColId: "c6"}, {ColId: "c7"}},
-			ParentId:    "t1",
 		},
 	}
 	tablesOnly := s.GetDDL(Config{Tables: true, ForeignKeys: false, SpDialect: constants.DIALECT_POSTGRESQL})
@@ -616,10 +622,11 @@ func TestGetSortedTableIdsBySpName(t *testing.T) {
 		{
 			description: "Schema with one table",
 			schema: Schema{
-				"table_id_1": CreateTable{
-					Name: "Table1",
-					Id:   "table_id_1",
-				},
+				Tables: map[string]CreateTable{
+					"table_id_1": CreateTable{
+						Name: "Table1",
+						Id:   "table_id_1",
+					},},
 			},
 			expected: []string{"table_id_1"},
 		},
@@ -627,19 +634,21 @@ func TestGetSortedTableIdsBySpName(t *testing.T) {
 		{
 			description: "Schema with interleaved tables",
 			schema: Schema{
-				"table_id_1": CreateTable{
-					Name: "Table1",
-					Id:   "table_id_1",
-				},
-				"table_id_2": CreateTable{
-					Name:     "Table2",
-					Id:       "table_id_2",
-					ParentId: "table_id_1",
-				},
-				"table_id_3": CreateTable{
-					Name:     "Table3",
-					Id:       "table_id_3",
-					ParentId: "table_id_2",
+				Tables: map[string]CreateTable{
+					"table_id_1": CreateTable{
+						Name: "Table1",
+						Id:   "table_id_1",
+					},
+					"table_id_2": CreateTable{
+						Name:     "Table2",
+						Id:       "table_id_2",
+						ParentId: "table_id_1",
+					},
+					"table_id_3": CreateTable{
+						Name:     "Table3",
+						Id:       "table_id_3",
+						ParentId: "table_id_2",
+					},
 				},
 			},
 			expected: []string{"table_id_1", "table_id_2", "table_id_3"},
@@ -648,13 +657,15 @@ func TestGetSortedTableIdsBySpName(t *testing.T) {
 		{
 			description: "Schema with tables having no parent",
 			schema: Schema{
-				"table_id_1": CreateTable{
-					Name: "Table1",
-					Id:   "table_id_1",
-				},
-				"table_id_2": CreateTable{
-					Name: "Table2",
-					Id:   "table_id_2",
+				Tables: map[string]CreateTable{
+					"table_id_1": CreateTable{
+						Name: "Table1",
+						Id:   "table_id_1",
+					},
+					"table_id_2": CreateTable{
+						Name: "Table2",
+						Id:   "table_id_2",
+					},
 				},
 			},
 			expected: []string{"table_id_1", "table_id_2"},
@@ -663,10 +674,12 @@ func TestGetSortedTableIdsBySpName(t *testing.T) {
 		{
 			description: "Schema with a table having a non-existent parent",
 			schema: Schema{
-				"table_id_1": CreateTable{
-					Name:     "Table1",
-					Id:       "table_id_1",
-					ParentId: "table_id_2",
+				Tables: map[string]CreateTable{
+					"table_id_1": CreateTable{
+						Name:     "Table1",
+						Id:       "table_id_1",
+						ParentId: "table_id_2",
+					},
 				},
 			},
 			expected: []string{"table_id_1"},

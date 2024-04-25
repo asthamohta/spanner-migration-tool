@@ -51,18 +51,19 @@ func TestUpdatePrimaryKey(t *testing.T) {
 			statusCode: http.StatusOK,
 			conv: internal.Conv{
 
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "film_actor",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-							"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-							"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
-						Id:          "t1",
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "film_actor",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+								"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+								"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
+							Id:          "t1",
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 				},
@@ -70,18 +71,19 @@ func TestUpdatePrimaryKey(t *testing.T) {
 			},
 			expectedConv: internal.Conv{
 
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "film_actor",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-							"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-							"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: false}},
-						Id:          "t1",
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "film_actor",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+								"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+								"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: false}},
+							Id:          "t1",
+						}}},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
 				},
@@ -96,18 +98,19 @@ func TestUpdatePrimaryKey(t *testing.T) {
 			statusCode: http.StatusOK,
 			conv: internal.Conv{
 
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "film_actor",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-							"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-							"c3": {Name: "synth_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Order: 1, Desc: true}, {ColId: "c1", Order: 2, Desc: true}},
-						Id:          "t1",
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "film_actor",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+								"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+								"c3": {Name: "synth_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Order: 1, Desc: true}, {ColId: "c1", Order: 2, Desc: true}},
+							Id:          "t1",
+						}}},
 				SyntheticPKeys: map[string]internal.SyntheticPKey{
 					"t1": {ColId: "c3", Sequence: 0},
 				},
@@ -121,17 +124,18 @@ func TestUpdatePrimaryKey(t *testing.T) {
 				},
 			},
 			expectedConv: internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "film_actor",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-							"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
-						Id:          "t1",
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "film_actor",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+								"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
+							Id:          "t1",
+						}}},
 				SyntheticPKeys: map[string]internal.SyntheticPKey{},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {
@@ -176,18 +180,19 @@ func TestAddPrimaryKey(t *testing.T) {
 
 	c := &internal.Conv{
 
-		SpSchema: map[string]ddl.CreateTable{
-			"t1": {
-				Name:   "film_actor",
-				ColIds: []string{"c1", "c2", "c3"},
-				ColDefs: map[string]ddl.ColumnDef{
-					"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-					"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-					"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-				},
-				PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
-				Id:          "t1",
-			}},
+		SpSchema: ddl.Schema{
+			Tables: map[string]ddl.CreateTable{
+				"t1": {
+					Name:   "film_actor",
+					ColIds: []string{"c1", "c2", "c3"},
+					ColDefs: map[string]ddl.ColumnDef{
+						"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+						"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+						"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+					},
+					PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
+					Id:          "t1",
+				}}},
 		Audit: internal.Audit{
 			MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 		},
@@ -228,19 +233,20 @@ func TestAddPrimaryKey(t *testing.T) {
 
 	expectedConv := &internal.Conv{
 
-		SpSchema: map[string]ddl.CreateTable{
+		SpSchema: ddl.Schema{
+			Tables: map[string]ddl.CreateTable{
 
-			"t1": {
-				Name:   "film_actor",
-				ColIds: []string{"c1", "c2", "c3"},
-				ColDefs: map[string]ddl.ColumnDef{
-					"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-					"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-					"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-				},
-				PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}, {ColId: "c2", Desc: false, Order: 2}},
-				Id:          "t1",
-			},
+				"t1": {
+					Name:   "film_actor",
+					ColIds: []string{"c1", "c2", "c3"},
+					ColDefs: map[string]ddl.ColumnDef{
+						"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+						"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+						"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+					},
+					PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}, {ColId: "c2", Desc: false, Order: 2}},
+					Id:          "t1",
+				}},
 		},
 		SchemaIssues: map[string]internal.TableIssues{
 			"t1": {},
@@ -256,19 +262,20 @@ func TestRemovePrimaryKey(t *testing.T) {
 
 	c := &internal.Conv{
 
-		SpSchema: map[string]ddl.CreateTable{
+		SpSchema: ddl.Schema{
+			Tables: map[string]ddl.CreateTable{
 
-			"t1": {
-				Name:   "film_actor",
-				ColIds: []string{"c1", "c2", "c3"},
-				ColDefs: map[string]ddl.ColumnDef{
-					"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-					"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-					"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-				},
-				PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}, {ColId: "c2", Desc: false, Order: 2}},
-				Id:          "t1",
-			},
+				"t1": {
+					Name:   "film_actor",
+					ColIds: []string{"c1", "c2", "c3"},
+					ColDefs: map[string]ddl.ColumnDef{
+						"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+						"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+						"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+					},
+					PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}, {ColId: "c2", Desc: false, Order: 2}},
+					Id:          "t1",
+				}},
 		},
 		Audit: internal.Audit{
 			MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
@@ -310,18 +317,19 @@ func TestRemovePrimaryKey(t *testing.T) {
 
 	expectedConv := &internal.Conv{
 
-		SpSchema: map[string]ddl.CreateTable{
-			"t1": {
-				Name:   "film_actor",
-				ColIds: []string{"c1", "c2", "c3"},
-				ColDefs: map[string]ddl.ColumnDef{
-					"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-					"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-					"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-				},
-				PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
-				Id:          "t1",
-			}},
+		SpSchema: ddl.Schema{
+			Tables: map[string]ddl.CreateTable{
+				"t1": {
+					Name:   "film_actor",
+					ColIds: []string{"c1", "c2", "c3"},
+					ColDefs: map[string]ddl.ColumnDef{
+						"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+						"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+						"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+					},
+					PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}},
+					Id:          "t1",
+				}}},
 		SchemaIssues: map[string]internal.TableIssues{
 			"t1": {},
 		},
@@ -335,18 +343,19 @@ func TestPrimarykey(t *testing.T) {
 
 	c := &internal.Conv{
 
-		SpSchema: map[string]ddl.CreateTable{
-			"t1": {
-				Name:   "film_actor",
-				ColIds: []string{"c1", "c2", "c3"},
-				ColDefs: map[string]ddl.ColumnDef{
-					"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
-					"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
-					"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
-				},
-				PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}, {ColId: "c2", Order: 2, Desc: true}},
-				Id:          "t1",
-			}},
+		SpSchema: ddl.Schema{
+			Tables: map[string]ddl.CreateTable{
+				"t1": {
+					Name:   "film_actor",
+					ColIds: []string{"c1", "c2", "c3"},
+					ColDefs: map[string]ddl.ColumnDef{
+						"c1": {Name: "film_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c1"},
+						"c2": {Name: "actor_id", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c2"},
+						"c3": {Name: "last_update", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, Id: "c3"},
+					},
+					PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Order: 1, Desc: true}, {ColId: "c2", Order: 2, Desc: true}},
+					Id:          "t1",
+				}}},
 		Audit: internal.Audit{
 			MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 		},

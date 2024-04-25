@@ -52,16 +52,17 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "t1",
@@ -82,16 +83,17 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Bytes, Len: 6}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Bytes, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "t1",
@@ -126,26 +128,27 @@ func TestReviewTableSchema(t *testing.T) {
         }`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+							ForeignKeys: []ddl.Foreignkey{{Name: "fk1", Id: "f1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c3"}}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-						ForeignKeys: []ddl.Foreignkey{{Name: "fk1", Id: "f1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c3"}}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -179,16 +182,17 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Bytes, Len: 6}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Bytes, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -222,26 +226,27 @@ func TestReviewTableSchema(t *testing.T) {
         }`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+							ForeignKeys: []ddl.Foreignkey{{Name: "fk1", Id: "f1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c3"}}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-						ForeignKeys: []ddl.Foreignkey{{Name: "fk1", Id: "f1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c3"}}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -275,24 +280,25 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Bytes, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Bytes, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -334,26 +340,27 @@ func TestReviewTableSchema(t *testing.T) {
         }`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -387,25 +394,26 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -447,26 +455,27 @@ func TestReviewTableSchema(t *testing.T) {
         }`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -500,25 +509,26 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-					}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c3": {Name: "a", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "table1",
@@ -560,17 +570,18 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Id: "c1", Name: "a", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Id: "c2", Name: "b", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Id: "c1", Name: "a", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Id: "c2", Name: "b", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Id:     "t1",
@@ -589,18 +600,19 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Id:     "t1",
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Id: "c1", Name: "a", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Id: "c2", Name: "b", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Id: "c3", Name: "c", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Id:     "t1",
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Id: "c1", Name: "a", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Id: "c2", Name: "b", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Id: "c3", Name: "c", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Id:     "t1",
@@ -630,17 +642,18 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {
 						ColumnLevelIssues: map[string][]internal.SchemaIssue{
@@ -653,16 +666,17 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
 				},
@@ -682,30 +696,31 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}, {ColId: "c3", Desc: false, Order: 2}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}, {ColId: "c3", Desc: false, Order: 2}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-					},
-				},
+					}},
 
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {
@@ -719,28 +734,29 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							ParentId:    "",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						ParentId:    "",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
+						}},
 				},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
@@ -761,29 +777,30 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}, {ColId: "c3", Desc: false, Order: 2}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}, {ColId: "c3", Desc: false, Order: 2}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-						ParentId:    "t1",
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
+							ParentId:    "t1",
+						}},
 				},
 
 				SchemaIssues: map[string]internal.TableIssues{
@@ -798,28 +815,29 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							ParentId:    "",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						ParentId:    "",
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+						}},
 				},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
@@ -840,29 +858,30 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 2}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 2}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4"}, ReferTableId: "t1", ReferColumnIds: []string{"c1"}}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4"}, ReferTableId: "t1", ReferColumnIds: []string{"c1"}}},
+						}},
 				},
 
 				SchemaIssues: map[string]internal.TableIssues{
@@ -878,28 +897,29 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
-				},
+					}},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
 				},
@@ -919,29 +939,30 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4"}, ReferTableId: "t1", ReferColumnIds: []string{"c2"}}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4"}, ReferTableId: "t1", ReferColumnIds: []string{"c2"}}},
+						}},
 				},
 
 				SchemaIssues: map[string]internal.TableIssues{
@@ -957,28 +978,29 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4"}, ReferTableId: "t1", ReferColumnIds: []string{"c2"}}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4"}, ReferTableId: "t1", ReferColumnIds: []string{"c2"}}},
+						}},
 				},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
@@ -999,29 +1021,30 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c1", "c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c4", "c5"}}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c1", "c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c4", "c5"}}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
+						}},
 				},
 
 				SchemaIssues: map[string]internal.TableIssues{
@@ -1037,28 +1060,29 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c5"}}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c2"}, ReferTableId: "t2", ReferColumnIds: []string{"c5"}}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+						}},
 				},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
@@ -1079,29 +1103,30 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4", "c5"}, ReferTableId: "t1", ReferColumnIds: []string{"c1", "c2"}}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c4", "c5"}, ReferTableId: "t1", ReferColumnIds: []string{"c1", "c2"}}},
+						}},
 				},
 
 				SchemaIssues: map[string]internal.TableIssues{
@@ -1117,28 +1142,29 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c4", "c5"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c5"}, ReferTableId: "t1", ReferColumnIds: []string{"c2"}}},
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c4", "c5"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c5": {Name: "d", Id: "c5", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							ForeignKeys: []ddl.Foreignkey{{Id: "f1", Name: "fk1", ColIds: []string{"c5"}, ReferTableId: "t1", ReferColumnIds: []string{"c2"}}},
+						}},
 				},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
@@ -1159,19 +1185,20 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						Indexes:     []ddl.CreateIndex{{Id: "i1", Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}, {ColId: "c2", Desc: false, Order: 2}}}},
-					},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							Indexes:     []ddl.CreateIndex{{Id: "i1", Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}, {ColId: "c2", Desc: false, Order: 2}}}},
+						}},
 				},
 
 				SchemaIssues: map[string]internal.TableIssues{
@@ -1187,18 +1214,19 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
-						Indexes:     []ddl.CreateIndex{{Id: "i1", Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}}},
-					},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c3", Desc: false, Order: 1}},
+							Indexes:     []ddl.CreateIndex{{Id: "i1", Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}}},
+						}},
 				},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {},
@@ -1219,33 +1247,35 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 				},
@@ -1262,33 +1292,35 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: 20}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: 20}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 				},
@@ -1305,53 +1337,55 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "t2",
-						ColIds: []string{"c1", "2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-					},
+						"t2": {
+							Name:   "t2",
+							ColIds: []string{"c1", "2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+						}},
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "t2",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-					},
+						"t2": {
+							Name:   "t2",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+						}},
 				},
 				SpDialect: constants.DIALECT_GOOGLESQL,
 			},
@@ -1367,53 +1401,55 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "t2",
-						ColIds: []string{"c1", "2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-					},
+						"t2": {
+							Name:   "t2",
+							ColIds: []string{"c1", "2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+						}},
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: 20}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: 20}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
+							ParentId:    "t2",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
-						ParentId:    "t2",
-					},
-					"t2": {
-						Name:   "t2",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: 20}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-					},
+						"t2": {
+							Name:   "t2",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: 20}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+						}},
 				},
 				SpDialect: constants.DIALECT_GOOGLESQL,
 			},
@@ -1430,24 +1466,25 @@ func TestReviewTableSchema(t *testing.T) {
 			}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+							ForeignKeys: []ddl.Foreignkey{{Name: "fk1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c4"}}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-						ForeignKeys: []ddl.Foreignkey{{Name: "fk1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c4"}}},
-					},
-					"t2": {
-						Name:   "t2",
-						ColIds: []string{"c4"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false}},
-					},
+						"t2": {
+							Name:   "t2",
+							ColIds: []string{"c4"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false}},
+						}},
 				},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
@@ -1479,24 +1516,25 @@ func TestReviewTableSchema(t *testing.T) {
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+							ForeignKeys: []ddl.Foreignkey{{Name: "fk1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c4"}}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-						ForeignKeys: []ddl.Foreignkey{{Name: "fk1", ColIds: []string{"c1"}, ReferTableId: "t2", ReferColumnIds: []string{"c4"}}},
-					},
-					"t2": {
-						Name:   "t2",
-						ColIds: []string{"c4"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false}},
-					},
+						"t2": {
+							Name:   "t2",
+							ColIds: []string{"c4"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c4": {Name: "a", Id: "c4", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c4", Desc: false}},
+						}},
 				},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
@@ -1542,58 +1580,60 @@ func TestReviewTableSchema(t *testing.T) {
 		}`,
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c1", "2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-						ParentId:    "t1",
-					},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c1", "2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+							ParentId:    "t1",
+						}},
 				},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						Id:     "t1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							Id:     "t1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}, {ColId: "c2", Desc: false}},
-					},
-					"t2": {
-						Name:   "table2",
-						Id:     "t2",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+						"t2": {
+							Name:   "table2",
+							Id:     "t2",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "aa", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+							ParentId:    "t1",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-						ParentId:    "t1",
-					},
-				},
+					}},
 			},
 		},
 	}
@@ -1628,7 +1668,7 @@ func TestReviewTableSchema(t *testing.T) {
 				status, tc.statusCode)
 		}
 
-		expectedddl := GetSpannerTableDDL(tc.expectedConv.SpSchema[tc.tableId], tc.expectedConv.SpDialect, sessionState.Driver)
+		expectedddl := GetSpannerTableDDL(tc.expectedConv.SpSchema.Tables[tc.tableId], tc.expectedConv.SpDialect, sessionState.Driver)
 
 		if tc.statusCode == http.StatusOK {
 			assert.Equal(t, expectedddl, res.DDL)

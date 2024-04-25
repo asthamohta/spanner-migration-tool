@@ -43,7 +43,7 @@ export class AddIndexFormComponent implements OnInit {
       next: (res: IConv) => {
         this.conv = res
         this.tableNames = Object.keys(res.SpSchema).map(
-          (talbeId: string) => res.SpSchema[talbeId].Name
+          (talbeId: string) => res.SpSchema.Tables[talbeId].Name
         )
       },
     })
@@ -69,7 +69,7 @@ export class AddIndexFormComponent implements OnInit {
 
   getRuleData(data: IRule) {
     this.ruleId = data?.Id
-    let tableName: string = this.conv.SpSchema[data?.Data?.TableId]?.Name
+    let tableName: string = this.conv.SpSchema.Tables[data?.Data?.TableId]?.Name
     this.addIndexForm.controls['tableName'].setValue(tableName)
     this.addIndexForm.controls['indexName'].setValue(data?.Data?.Name)
     this.selectedTableChange(tableName)
@@ -86,7 +86,7 @@ export class AddIndexFormComponent implements OnInit {
       this.updateCommonColumns()
       this.addColumnsList.push([...this.commonColumns])
 
-      let columnName: string = this.conv.SpSchema[tableId]?.ColDefs[data[i].ColId].Name
+      let columnName: string = this.conv.SpSchema.Tables[tableId]?.ColDefs[data[i].ColId].Name
 
       let newForm = this.fb.group({
         columnName: [columnName, Validators.required],
@@ -104,8 +104,8 @@ export class AddIndexFormComponent implements OnInit {
   selectedTableChange(tableName: string) {
     let tableId = this.conversion.getTableIdFromSpName(tableName, this.conv)
     if (tableId) {
-      let spTableData = this.conv.SpSchema[tableId]
-      this.totalColumns = this.conv.SpSchema[tableId].ColIds.map(
+      let spTableData = this.conv.SpSchema.Tables[tableId]
+      this.totalColumns = this.conv.SpSchema.Tables[tableId].ColIds.map(
         (colId: string) => spTableData.ColDefs[colId].Name
       )
     }

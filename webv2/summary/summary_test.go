@@ -34,16 +34,17 @@ func TestGetSummary(t *testing.T) {
 	}{
 		{
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "tn1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{"c1": {Name: "cn1", T: ddl.Type{Name: "STRING", IsArray: false}, NotNull: true, Comment: "", Id: "c1"},
-							"c2": {Name: "cn2", T: ddl.Type{Name: "STRING", IsArray: false}, NotNull: true, Comment: "", Id: "c2"},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}},
-						Id:          "t1",
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "tn1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{"c1": {Name: "cn1", T: ddl.Type{Name: "STRING", IsArray: false}, NotNull: true, Comment: "", Id: "c1"},
+								"c2": {Name: "cn2", T: ddl.Type{Name: "STRING", IsArray: false}, NotNull: true, Comment: "", Id: "c2"},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false, Order: 1}},
+							Id:          "t1",
+						}}},
 				SrcSchema: map[string]schema.Table{
 
 					"t1": {

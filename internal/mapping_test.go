@@ -78,52 +78,54 @@ func TestGetSpannerTable(t *testing.T) {
 			},
 		},
 
-		SpSchema: map[string]ddl.CreateTable{
-			"t2": {
-				Name: "table",
-				Id:   "t2",
-			}, "t3": {
-				Name: "tab_le_5",
-				Id:   "t3",
-			}, "t4": {
-				Name: "tab_le",
-				Id:   "t4",
-			},
-			"t5": {
-				Name: "tab_le_4",
-				Id:   "t5",
-			},
-			"t6": {
-				Name: "tab_le_7",
-				Id:   "t6",
-			},
-			"t7": {
-				Name: "tab_le_4_6",
-				Id:   "t7",
-			},
-			"t8": {
-				Name: "Atable",
-				Id:   "t8",
-			},
-			"t9": {
-				Name: "tab_le_6",
-				Id:   "t9",
-			},
-			"t10": {
-				Name: "Atable_8",
-				Id:   "t10",
-			},
-			"t11": {
-				Name: "Atable_9",
-				Id:   "t11",
-			},
-			"t12": {
-				Name: "TABLE_10",
-				Id:   "t12",
-			},
-			"t13": {
-				Name: "TAB_LE_5_11",
-				Id:   "t13",
+		SpSchema: ddl.Schema{
+			Tables: map[string]ddl.CreateTable{
+				"t2": {
+					Name: "table",
+					Id:   "t2",
+				}, "t3": {
+					Name: "tab_le_5",
+					Id:   "t3",
+				}, "t4": {
+					Name: "tab_le",
+					Id:   "t4",
+				},
+				"t5": {
+					Name: "tab_le_4",
+					Id:   "t5",
+				},
+				"t6": {
+					Name: "tab_le_7",
+					Id:   "t6",
+				},
+				"t7": {
+					Name: "tab_le_4_6",
+					Id:   "t7",
+				},
+				"t8": {
+					Name: "Atable",
+					Id:   "t8",
+				},
+				"t9": {
+					Name: "tab_le_6",
+					Id:   "t9",
+				},
+				"t10": {
+					Name: "Atable_8",
+					Id:   "t10",
+				},
+				"t11": {
+					Name: "Atable_9",
+					Id:   "t11",
+				},
+				"t12": {
+					Name: "TABLE_10",
+					Id:   "t12",
+				},
+				"t13": {
+					Name: "TAB_LE_5_11",
+					Id:   "t13",
+				},
 			},
 		},
 	}
@@ -206,22 +208,24 @@ func TestGetSpannerCol(t *testing.T) {
 			},
 		},
 	}
-	conv.SpSchema = map[string]ddl.CreateTable{
-		"t1": {
-			Name: "table",
-			Id:   "t1",
-		},
-		"t2": {
-			Name: "ta_b_le",
-			Id:   "t2",
-		},
-		"t3": {
-			Name: "t_able",
-			Id:   "t3",
-		},
-		"t4": {
-			Name: "table1",
-			Id:   "t4",
+	conv.SpSchema = ddl.Schema{
+		Tables: map[string]ddl.CreateTable{
+			"t1": {
+				Name: "table",
+				Id:   "t1",
+			},
+			"t2": {
+				Name: "ta_b_le",
+				Id:   "t2",
+			},
+			"t3": {
+				Name: "t_able",
+				Id:   "t3",
+			},
+			"t4": {
+				Name: "table1",
+				Id:   "t4",
+			},
 		},
 	}
 	basicTests := []struct {
@@ -246,7 +250,7 @@ func TestGetSpannerCol(t *testing.T) {
 		tableId, _ := GetTableIdFromSrcName(conv.SrcSchema, tc.srcTable)
 		_, err1 := GetSpannerTable(conv, tableId) // Ensure table is known.
 		colId, _ := GetColIdFromSrcName(conv.SrcSchema[tableId].ColDefs, tc.srcCol)
-		spCol, err2 := GetSpannerCol(conv, tableId, colId, conv.SpSchema[tableId].ColDefs)
+		spCol, err2 := GetSpannerCol(conv, tableId, colId, conv.SpSchema.Tables[tableId].ColDefs)
 		if tc.error {
 			assert.True(t, err1 != nil || err2 != nil, tc.name)
 			continue
@@ -255,7 +259,7 @@ func TestGetSpannerCol(t *testing.T) {
 	}
 
 	//Column name collision test
-	conv.SpSchema["t4"] = ddl.CreateTable{
+	conv.SpSchema.Tables["t4"] = ddl.CreateTable{
 		Name:   "table1",
 		Id:     "t4",
 		ColIds: []string{"c5", "c6", "c7"},
@@ -282,13 +286,13 @@ func TestGetSpannerCol(t *testing.T) {
 		tableId, _ := GetTableIdFromSrcName(conv.SrcSchema, tc.srcTable)
 		_, err1 := GetSpannerTable(conv, tableId) // Ensure table is known.
 		colId, _ := GetColIdFromSrcName(conv.SrcSchema[tableId].ColDefs, tc.srcCol)
-		spCol, err2 := GetSpannerCol(conv, tableId, colId, conv.SpSchema[tableId].ColDefs)
+		spCol, err2 := GetSpannerCol(conv, tableId, colId, conv.SpSchema.Tables[tableId].ColDefs)
 		if tc.error {
 			assert.True(t, err1 != nil || err2 != nil, tc.name)
 			continue
 		}
 		assert.Equal(t, tc.spCol, spCol, tc.name)
-		conv.SpSchema[tableId].ColDefs[colId] = ddl.ColumnDef{Name: spCol, Id: colId}
+		conv.SpSchema.Tables[tableId].ColDefs[colId] = ddl.ColumnDef{Name: spCol, Id: colId}
 	}
 }
 
@@ -345,48 +349,52 @@ func TestResolveRefs(t *testing.T) {
 	}{
 		{
 			name: "Refer column Id not found",
-			spSchema: map[string]ddl.CreateTable{
-				"t1": {
-					Name:   "cc",
-					Id:     "t1",
-					ColIds: []string{"c1", "c2", "c3"},
-					ColDefs: map[string]ddl.ColumnDef{
-						"c1": {Name: "ccol1", T: ddl.Type{Name: ddl.Int64}},
-						"c2": {Name: "ccol2", T: ddl.Type{Name: ddl.Int64}},
-						"c3": {Name: "ccol3", T: ddl.Type{Name: ddl.Int64}},
+			spSchema: ddl.Schema{
+				Tables: map[string]ddl.CreateTable{
+					"t1": {
+						Name:   "cc",
+						Id:     "t1",
+						ColIds: []string{"c1", "c2", "c3"},
+						ColDefs: map[string]ddl.ColumnDef{
+							"c1": {Name: "ccol1", T: ddl.Type{Name: ddl.Int64}},
+							"c2": {Name: "ccol2", T: ddl.Type{Name: ddl.Int64}},
+							"c3": {Name: "ccol3", T: ddl.Type{Name: ddl.Int64}},
+						},
+						ForeignKeys: []ddl.Foreignkey{{Name: "fk_test3", ColIds: []string{"c2", "c3"}, ReferTableId: "t2", ReferColumnIds: []string{"c4", "c9"}}},
 					},
-					ForeignKeys: []ddl.Foreignkey{{Name: "fk_test3", ColIds: []string{"c2", "c3"}, ReferTableId: "t2", ReferColumnIds: []string{"c4", "c9"}}},
-				},
-				"t2": {
-					Name:   "dd",
-					Id:     "t2",
-					ColIds: []string{"c4", "c5", "c6"},
-					ColDefs: map[string]ddl.ColumnDef{
-						"c4": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
-						"c5": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
-						"c6": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+					"t2": {
+						Name:   "dd",
+						Id:     "t2",
+						ColIds: []string{"c4", "c5", "c6"},
+						ColDefs: map[string]ddl.ColumnDef{
+							"c4": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
+							"c5": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
+							"c6": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+						},
 					},
 				},
 			},
-			expectedSpSchema: map[string]ddl.CreateTable{
-				"t1": {
-					Name:   "cc",
-					Id:     "t1",
-					ColIds: []string{"c1", "c2", "c3"},
-					ColDefs: map[string]ddl.ColumnDef{
-						"c1": {Name: "ccol1", T: ddl.Type{Name: ddl.Int64}},
-						"c2": {Name: "ccol2", T: ddl.Type{Name: ddl.Int64}},
-						"c3": {Name: "ccol3", T: ddl.Type{Name: ddl.Int64}},
+			expectedSpSchema: ddl.Schema{
+				Tables: map[string]ddl.CreateTable{
+					"t1": {
+						Name:   "cc",
+						Id:     "t1",
+						ColIds: []string{"c1", "c2", "c3"},
+						ColDefs: map[string]ddl.ColumnDef{
+							"c1": {Name: "ccol1", T: ddl.Type{Name: ddl.Int64}},
+							"c2": {Name: "ccol2", T: ddl.Type{Name: ddl.Int64}},
+							"c3": {Name: "ccol3", T: ddl.Type{Name: ddl.Int64}},
+						},
 					},
-				},
-				"t2": {
-					Name:   "dd",
-					Id:     "t2",
-					ColIds: []string{"c4", "c5", "c6"},
-					ColDefs: map[string]ddl.ColumnDef{
-						"c4": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
-						"c5": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
-						"c6": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+					"t2": {
+						Name:   "dd",
+						Id:     "t2",
+						ColIds: []string{"c4", "c5", "c6"},
+						ColDefs: map[string]ddl.ColumnDef{
+							"c4": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
+							"c5": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
+							"c6": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+						},
 					},
 				},
 			},
@@ -394,28 +402,32 @@ func TestResolveRefs(t *testing.T) {
 		},
 		{
 			name: "Refer table Id not found",
-			spSchema: map[string]ddl.CreateTable{
-				"t1": {
-					Name:   "dd",
-					Id:     "t1",
-					ColIds: []string{"c1", "c2", "c3"},
-					ColDefs: map[string]ddl.ColumnDef{
-						"c1": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
-						"c2": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
-						"c3": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+			spSchema: ddl.Schema{
+				Tables: map[string]ddl.CreateTable{
+					"t1": {
+						Name:   "dd",
+						Id:     "t1",
+						ColIds: []string{"c1", "c2", "c3"},
+						ColDefs: map[string]ddl.ColumnDef{
+							"c1": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
+							"c2": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
+							"c3": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+						},
+						ForeignKeys: []ddl.Foreignkey{{Name: "fk_test4", ColIds: []string{"c3"}, ReferTableId: "t3", ReferColumnIds: []string{"c6"}}},
 					},
-					ForeignKeys: []ddl.Foreignkey{{Name: "fk_test4", ColIds: []string{"c3"}, ReferTableId: "t3", ReferColumnIds: []string{"c6"}}},
 				},
 			},
-			expectedSpSchema: map[string]ddl.CreateTable{
-				"t1": {
-					Name:   "dd",
-					Id:     "t1",
-					ColIds: []string{"c1", "c2", "c3"},
-					ColDefs: map[string]ddl.ColumnDef{
-						"c1": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
-						"c2": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
-						"c3": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+			expectedSpSchema: ddl.Schema{
+				Tables: map[string]ddl.CreateTable{
+					"t1": {
+						Name:   "dd",
+						Id:     "t1",
+						ColIds: []string{"c1", "c2", "c3"},
+						ColDefs: map[string]ddl.ColumnDef{
+							"c1": {Name: "dcol1", T: ddl.Type{Name: ddl.Int64}},
+							"c2": {Name: "ddcol2", T: ddl.Type{Name: ddl.Int64}},
+							"c3": {Name: "dcol3", T: ddl.Type{Name: ddl.Int64}},
+						},
 					},
 				},
 			},

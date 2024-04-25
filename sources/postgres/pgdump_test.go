@@ -78,9 +78,9 @@ func TestProcessPgDump(t *testing.T) {
 		noIssues(conv, t, "Scalar type: "+tc.ty)
 		tableId, err := internal.GetTableIdFromSpName(conv.SpSchema, "t")
 		assert.Equal(t, nil, err)
-		colId, err := internal.GetColIdFromSpName(conv.SpSchema[tableId].ColDefs, "a")
+		colId, err := internal.GetColIdFromSpName(conv.SpSchema.Tables[tableId].ColDefs, "a")
 		assert.Equal(t, nil, err)
-		assert.Equal(t, conv.SpSchema[tableId].ColDefs[colId].T, tc.expected, "Scalar type: "+tc.ty)
+		assert.Equal(t, conv.SpSchema.Tables[tableId].ColDefs[colId].T, tc.expected, "Scalar type: "+tc.ty)
 	}
 	// Next test array types and not null.
 	singleColTests := []struct {
@@ -99,9 +99,9 @@ func TestProcessPgDump(t *testing.T) {
 		noIssues(conv, t, "Not null: "+tc.ty)
 		tableId, err := internal.GetTableIdFromSpName(conv.SpSchema, "t")
 		assert.Equal(t, nil, err)
-		colId, err := internal.GetColIdFromSpName(conv.SpSchema[tableId].ColDefs, "a")
+		colId, err := internal.GetColIdFromSpName(conv.SpSchema.Tables[tableId].ColDefs, "a")
 		assert.Equal(t, nil, err)
-		cd := conv.SpSchema[tableId].ColDefs[colId]
+		cd := conv.SpSchema.Tables[tableId].ColDefs[colId]
 		cd.Comment = ""
 		cd.Id = ""
 		assert.Equal(t, tc.expected, cd, "Not null: "+tc.ty)
@@ -654,7 +654,7 @@ COPY test (id, a, b, c, d, e, f, g) FROM stdin;
 			noIssues(conv, t, tc.name)
 		}
 		if tc.expectedSchema != nil {
-			internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema))
+			internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 		}
 		if tc.expectedData != nil {
 			assert.Equal(t, tc.expectedData, rows, tc.name+": Data rows did not match")
@@ -758,7 +758,7 @@ func TestProcessPgDumpPGTarget(t *testing.T) {
 		noIssues(conv, t, "Scalar type: "+tc.ty)
 		tableId, _ := internal.GetTableIdFromSrcName(conv.SrcSchema, "t")
 		columnId, _ := internal.GetColIdFromSrcName(conv.SrcSchema[tableId].ColDefs, "a")
-		assert.Equal(t, conv.SpSchema[tableId].ColDefs[columnId].T, tc.expected, "Scalar type: "+tc.ty)
+		assert.Equal(t, conv.SpSchema.Tables[tableId].ColDefs[columnId].T, tc.expected, "Scalar type: "+tc.ty)
 	}
 	// Next test array types and not null. For PG Spanner, all array types mapped to string.
 	singleColTests := []struct {
@@ -777,7 +777,7 @@ func TestProcessPgDumpPGTarget(t *testing.T) {
 		noIssues(conv, t, "Not null: "+tc.ty)
 		tableId, _ := internal.GetTableIdFromSrcName(conv.SrcSchema, "t")
 		columnId, _ := internal.GetColIdFromSrcName(conv.SrcSchema[tableId].ColDefs, "a")
-		cd := conv.SpSchema[tableId].ColDefs[columnId]
+		cd := conv.SpSchema.Tables[tableId].ColDefs[columnId]
 		cd.Comment = ""
 		cd.Id = ""
 		assert.Equal(t, tc.expected, cd, "Not null: "+tc.ty)
@@ -1329,7 +1329,7 @@ COPY test (id, a, b, c, d, e) FROM stdin;
 			noIssues(conv, t, tc.name)
 		}
 		if tc.expectedSchema != nil {
-			internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema))
+			internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 		}
 		if tc.expectedData != nil {
 			assert.Equal(t, tc.expectedData, rows, tc.name+": Data rows did not match")
@@ -1482,7 +1482,7 @@ func TestProcessPgDump_AddPrimaryKeys(t *testing.T) {
 		conv, _ := runProcessPgDump(tc.input)
 		conv.AddPrimaryKeys()
 		if tc.expectedSchema != nil {
-			internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema))
+			internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 		}
 	}
 }

@@ -26,7 +26,7 @@ func IndexSuggestion() {
 
 	sessionState := session.GetSessionState()
 
-	for _, spannerTable := range sessionState.Conv.SpSchema {
+	for _, spannerTable := range sessionState.Conv.SpSchema.Tables {
 		CheckIndexSuggestion(spannerTable.Indexes, spannerTable)
 	}
 }
@@ -35,7 +35,7 @@ func AssignInitialOrders() {
 	sessionState := session.GetSessionState()
 	conv := sessionState.Conv
 
-	for _, spannerTable := range conv.SpSchema {
+	for _, spannerTable := range conv.SpSchema.Tables {
 		for _, index := range spannerTable.Indexes {
 			order := 1
 			for i, key := range index.Keys {

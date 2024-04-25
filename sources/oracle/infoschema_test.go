@@ -204,7 +204,7 @@ func TestProcessSchemaOracle(t *testing.T) {
 			PrimaryKeys: []ddl.IndexKey{{ColId: "ID", Order: 1}},
 		},
 	}
-	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema))
+	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 	userTableId, err := internal.GetTableIdFromSpName(conv.SpSchema, "USER")
 	assert.Equal(t, nil, err)
 	testTableId, err := internal.GetTableIdFromSpName(conv.SpSchema, "TEST")

@@ -41,7 +41,7 @@ func GetSpannerTable(conv *Conv, tableId string) (string, error) {
 		return "", fmt.Errorf("bad parameter: table-id string is empty")
 	}
 
-	if sp, found := conv.SpSchema[tableId]; found {
+	if sp, found := conv.SpSchema.Tables[tableId]; found {
 		return sp.Name, nil
 	}
 	srcTableName := conv.SrcSchema[tableId].Name
@@ -111,7 +111,7 @@ func GetSpannerCols(conv *Conv, tableId string, srcCols []string) ([]string, err
 		if err != nil {
 			return nil, err
 		}
-		spCol, err := GetSpannerCol(conv, tableId, colId, conv.SpSchema[tableId].ColDefs)
+		spCol, err := GetSpannerCol(conv, tableId, colId, conv.SpSchema.Tables[tableId].ColDefs)
 		if err != nil {
 			return nil, err
 		}
@@ -188,9 +188,9 @@ func getSpannerValidName(conv *Conv, srcName string) string {
 //
 // TODO: Expand ResolveRefs to primary keys and indexes.
 func ResolveRefs(conv *Conv) {
-	for table, spTable := range conv.SpSchema {
+	for table, spTable := range conv.SpSchema.Tables {
 		spTable.ForeignKeys = resolveFks(conv, table, spTable.ForeignKeys)
-		conv.SpSchema[table] = spTable
+		conv.SpSchema.Tables[table] = spTable
 	}
 }
 
@@ -221,12 +221,12 @@ func resolveFks(conv *Conv, table string, fks []ddl.Foreignkey) []ddl.Foreignkey
 }
 
 func resolveTableRef(conv *Conv, tableRef string) (string, error) {
-	if _, ok := conv.SpSchema[tableRef]; ok {
+	if _, ok := conv.SpSchema.Tables[tableRef]; ok {
 		return tableRef, nil
 	}
 	// Do case-insensitive search for tableRef.
 	tr := strings.ToLower(tableRef)
-	for t := range conv.SpSchema {
+	for t := range conv.SpSchema.Tables {
 		if strings.ToLower(t) == tr {
 			return t, nil
 		}
@@ -240,12 +240,12 @@ func resolveColRefs(conv *Conv, tableRef string, colRefs []string) ([]string, er
 		return nil, err
 	}
 	resolveColRef := func(colRef string) (string, error) {
-		if _, ok := conv.SpSchema[table].ColDefs[colRef]; ok {
+		if _, ok := conv.SpSchema.Tables[table].ColDefs[colRef]; ok {
 			return colRef, nil
 		}
 		// Do case-insensitive search for colRef.
 		cr := strings.ToLower(colRef)
-		for _, c := range conv.SpSchema[table].ColIds {
+		for _, c := range conv.SpSchema.Tables[table].ColIds {
 			if strings.ToLower(c) == cr {
 				return c, nil
 			}

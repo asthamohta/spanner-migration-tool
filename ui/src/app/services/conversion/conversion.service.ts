@@ -49,7 +49,7 @@ export class ConversionService {
     sortOrder: string = ''
   ): ISchemaObjectNode[] {
     let spannerTableIds = Object.keys(conv.SpSchema).filter((tableId: string) =>
-      conv.SpSchema[tableId].Name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
+      conv.SpSchema.Tables[tableId].Name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
     )
 
     let deletedTableIds = Object.keys(conv.SrcSchema).filter((tableId: string) => {
@@ -71,12 +71,12 @@ export class ConversionService {
       id: '',
       parentId: '',
       children: spannerTableIds.map((tableId: string) => {
-        let spannerTable = conv.SpSchema[tableId]
+        let spannerTable = conv.SpSchema.Tables[tableId]
         return {
           name: spannerTable.Name,
           status: conversionRates[tableId],
           type: ObjectExplorerNodeType.Table,
-          parent: spannerTable.ParentId != '' ? conv.SpSchema[spannerTable.ParentId]?.Name : '',
+          parent: spannerTable.ParentId != '' ? conv.SpSchema.Tables[spannerTable.ParentId]?.Name : '',
           pos: -1,
           isSpannerNode: true,
           id: tableId,
@@ -86,7 +86,7 @@ export class ConversionService {
               name: `Indexes (${spannerTable.Indexes ? spannerTable.Indexes.length : 0})`,
               status: '',
               type: ObjectExplorerNodeType.Indexes,
-              parent: conv.SpSchema[tableId].Name,
+              parent: conv.SpSchema.Tables[tableId].Name,
               pos: -1,
               isSpannerNode: true,
               id: '',
@@ -96,7 +96,7 @@ export class ConversionService {
                     return {
                       name: index.Name,
                       type: ObjectExplorerNodeType.Index,
-                      parent: conv.SpSchema[tableId].Name,
+                      parent: conv.SpSchema.Tables[tableId].Name,
                       pos: i,
                       isSpannerNode: true,
                       id: index.Id,
@@ -137,7 +137,7 @@ export class ConversionService {
           parentNode.children![i].children![0].children?.push({
             name: index.Name.replace(/[^A-Za-z0-9_]/g, '_'),
             type: ObjectExplorerNodeType.Index,
-            parent: conv.SpSchema[tableNode.name]?.Name,
+            parent: conv.SpSchema.Tables[tableNode.name]?.Name,
             pos: i,
             isSpannerNode: true,
             isDeleted: true,
@@ -241,9 +241,9 @@ export class ConversionService {
   getColumnMapping(tableId: string, data: IConv): IColumnTabData[] {
     let spTableName = this.getSpannerTableNameFromId(tableId, data)
     let srcColIds = data.SrcSchema[tableId].ColIds
-    let spColIds = data.SpSchema[tableId] ? data.SpSchema[tableId].ColIds : null
+    let spColIds = data.SpSchema.Tables[tableId] ? data.SpSchema.Tables[tableId].ColIds : null
     let srcPks = data.SrcSchema[tableId].PrimaryKeys
-    let spPks = spColIds ? data.SpSchema[tableId].PrimaryKeys : null
+    let spPks = spColIds ? data.SpSchema.Tables[tableId].PrimaryKeys : null
     let standardTypeToPGSQLTypeMap: Map<String, String>
     this.standardTypeToPGSQLTypeMap.subscribe((typemap) => {
       standardTypeToPGSQLTypeMap = typemap
@@ -252,13 +252,13 @@ export class ConversionService {
     const res: IColumnTabData[] = data.SrcSchema[tableId].ColIds.map((colId: string, i: number) => {
       let spPkOrder
       if (spTableName) {
-        data.SpSchema[tableId].PrimaryKeys.forEach((pk: IIndexKey) => {
+        data.SpSchema.Tables[tableId].PrimaryKeys.forEach((pk: IIndexKey) => {
           if (pk.ColId == colId) {
             spPkOrder = pk.Order
           }
         })
       }
-      let spannerColDef = spTableName ? data.SpSchema[tableId]?.ColDefs[colId] : null
+      let spannerColDef = spTableName ? data.SpSchema.Tables[tableId]?.ColDefs[colId] : null
       let pgSQLDatatype = spannerColDef ? standardTypeToPGSQLTypeMap.get(spannerColDef.T.Name) : ''
       return {
         spOrder: spannerColDef ? i + 1 : '',
@@ -269,7 +269,7 @@ export class ConversionService {
         srcDataType: data.SrcSchema[tableId].ColDefs[colId].Type.Name,
         spIsPk:
           spannerColDef && spTableName
-            ? data.SpSchema[tableId].PrimaryKeys?.map((pk) => pk.ColId).indexOf(colId) !== -1
+            ? data.SpSchema.Tables[tableId].PrimaryKeys?.map((pk) => pk.ColId).indexOf(colId) !== -1
             : false,
         srcIsPk: srcPks ? srcPks.map((pk) => pk.ColId).indexOf(colId) !== -1 : false,
         spIsNotNull: spannerColDef && spTableName ? spannerColDef.NotNull : false,
@@ -283,8 +283,8 @@ export class ConversionService {
     if (spColIds) {
       spColIds.forEach((colId: string, i: number) => {
         if (srcColIds.indexOf(colId) < 0) {
-          let spColumn = data.SpSchema[tableId].ColDefs[colId]
-          let spannerColDef = spTableName ? data.SpSchema[tableId]?.ColDefs[colId] : null
+          let spColumn = data.SpSchema.Tables[tableId].ColDefs[colId]
+          let spannerColDef = spTableName ? data.SpSchema.Tables[tableId]?.ColDefs[colId] : null
           let pgSQLDatatype = spannerColDef ? standardTypeToPGSQLTypeMap.get(spannerColDef.T.Name) : ''
           res.push({
             spOrder: i + 1,
@@ -325,7 +325,7 @@ export class ConversionService {
       let spFk = this.getSpannerFkFromId(data, id, srcFk.Id)
       let spColumns = spFk
         ? spFk.ColIds.map((columnId: string) => {
-            return data.SpSchema[id].ColDefs[columnId].Name
+            return data.SpSchema.Tables[id].ColDefs[columnId].Name
           })
         : []
       let spColIds = spFk ? spFk.ColIds : []
@@ -334,7 +334,7 @@ export class ConversionService {
       })
       let spReferColumns = spFk
         ? spFk.ReferColumnIds.map((referColId: string) => {
-            return data.SpSchema[srcFk.ReferTableId].ColDefs[referColId].Name
+            return data.SpSchema.Tables[srcFk.ReferTableId].ColDefs[referColId].Name
           })
         : []
       let spReferColumnIds = spFk ? spFk.ReferColumnIds : []
@@ -349,7 +349,7 @@ export class ConversionService {
         srcName: srcFk.Name,
         spColumns: spColumns,
         srcColumns: srcColumns,
-        spReferTable: spFk ? data.SpSchema[spFk.ReferTableId].Name : '',
+        spReferTable: spFk ? data.SpSchema.Tables[spFk.ReferTableId].Name : '',
         srcReferTable: data.SrcSchema[srcFk.ReferTableId].Name,
         spReferColumns: spReferColumns,
         srcReferColumns: srcReferColumns,
@@ -384,7 +384,7 @@ export class ConversionService {
             srcColName: data.SrcSchema[tableId].ColDefs[srcIndexKey.ColId].Name,
             srcOrder: srcIndexKey.Order,
             srcDesc: srcIndexKey.Desc,
-            spColName: spIndexKey ? data.SpSchema[tableId].ColDefs[spIndexKey.ColId].Name : '',
+            spColName: spIndexKey ? data.SpSchema.Tables[tableId].ColDefs[spIndexKey.ColId].Name : '',
             spOrder: spIndexKey ? spIndexKey.Order : undefined,
             spDesc: spIndexKey ? spIndexKey.Desc : undefined,
           }
@@ -399,7 +399,7 @@ export class ConversionService {
           srcOrder: '',
           srcColId: undefined,
           srcDesc: undefined,
-          spColName: data.SpSchema[tableId].ColDefs[spColId].Name,
+          spColName: data.SpSchema.Tables[tableId].ColDefs[spColId].Name,
           spOrder: spIndexKey ? spIndexKey.Order : undefined,
           spDesc: spIndexKey ? spIndexKey.Desc : undefined,
           spColId: spIndexKey ? spIndexKey.ColId : undefined,
@@ -411,7 +411,7 @@ export class ConversionService {
 
   getSpannerFkFromId(conv: IConv, tableId: string, srcFkId: string): IForeignKey | null {
     let spFk: IForeignKey | null = null
-    conv.SpSchema[tableId]?.ForeignKeys?.forEach((fk: IForeignKey) => {
+    conv.SpSchema.Tables[tableId]?.ForeignKeys?.forEach((fk: IForeignKey) => {
       if (fk.Id == srcFkId) {
         spFk = fk
       }
@@ -431,7 +431,7 @@ export class ConversionService {
 
   getSpannerIndexFromId(conv: IConv, tableId: string, indexId: string): ICreateIndex | null {
     let spIndex: ICreateIndex | null = null
-    conv.SpSchema[tableId]?.Indexes?.forEach((index: ICreateIndex) => {
+    conv.SpSchema.Tables[tableId]?.Indexes?.forEach((index: ICreateIndex) => {
       if (index.Id == indexId) {
         spIndex = index
       }
@@ -447,8 +447,8 @@ export class ConversionService {
   ): IIndexKey | null {
     let indexKey: IIndexKey | null = null
 
-    let indexes = conv.SpSchema[tableId]?.Indexes
-      ? conv.SpSchema[tableId].Indexes.filter((index: IIndex) => {
+    let indexes = conv.SpSchema.Tables[tableId]?.Indexes
+      ? conv.SpSchema.Tables[tableId].Indexes.filter((index: IIndex) => {
           return index.Id == indexId
         })
       : null
@@ -487,9 +487,9 @@ export class ConversionService {
 
   getSpannerColDefFromId(tableName: string, id: string, data: IConv): IColumnDef | null {
     let res: IColumnDef | null = null
-    Object.keys(data.SpSchema[tableName].ColDefs).forEach((colName) => {
-      if (data.SpSchema[tableName].ColDefs[colName].Id == id) {
-        res = data.SpSchema[tableName].ColDefs[colName]
+    Object.keys(data.SpSchema.Tables[tableName].ColDefs).forEach((colName) => {
+      if (data.SpSchema.Tables[tableName].ColDefs[colName].Id == id) {
+        res = data.SpSchema.Tables[tableName].ColDefs[colName]
       }
     })
     return res
@@ -506,9 +506,9 @@ export class ConversionService {
   }
   getSpannerTableNameFromId(id: string, conv: IConv): string | null {
     let spName: string | null = null
-    Object.keys(conv.SpSchema).forEach((key: string) => {
-      if (conv.SpSchema[key].Id === id) {
-        spName = conv.SpSchema[key].Name
+    Object.keys(conv.SpSchema.Tables).forEach((key: string) => {
+      if (conv.SpSchema.Tables[key].Id === id) {
+        spName = conv.SpSchema.Tables[key].Name
       }
     })
     return spName
@@ -516,17 +516,17 @@ export class ConversionService {
   getTableIdFromSpName(name: string, conv: IConv): string {
     let tableId: string = ''
     Object.keys(conv.SpSchema).forEach((key: string) => {
-      if (conv.SpSchema[key].Name === name) {
-        tableId = conv.SpSchema[key].Id
+      if (conv.SpSchema.Tables[key].Name === name) {
+        tableId = conv.SpSchema.Tables[key].Id
       }
     })
     return tableId
   }
   getColIdFromSpannerColName(name: string, tableId: string, conv: IConv): string {
     let colId: string = ''
-    Object.keys(conv.SpSchema[tableId].ColDefs).forEach((key: string) => {
-      if (conv.SpSchema[tableId].ColDefs[key].Name === name) {
-        colId = conv.SpSchema[tableId].ColDefs[key].Id
+    Object.keys(conv.SpSchema.Tables[tableId].ColDefs).forEach((key: string) => {
+      if (conv.SpSchema.Tables[tableId].ColDefs[key].Name === name) {
+        colId = conv.SpSchema.Tables[tableId].ColDefs[key].Id
       }
     })
     return colId
@@ -535,7 +535,7 @@ export class ConversionService {
   getDeletedIndexes(conv: IConv): Record<string, IIndex[]> {
     let deletedIndexes: Record<string, IIndex[]> = {}
     Object.keys(conv.SpSchema).forEach((tableId: string) => {
-      let spTable = conv.SpSchema[tableId]
+      let spTable = conv.SpSchema.Tables[tableId]
       let srcTable = conv.SrcSchema[tableId]
       let spIndexIds: string[] =
         spTable && spTable.Indexes

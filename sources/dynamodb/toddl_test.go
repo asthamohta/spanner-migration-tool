@@ -60,7 +60,7 @@ func TestToSpannerType(t *testing.T) {
 	conv.Audit = audit
 	schemaToSpanner := common.SchemaToSpannerImpl{}
 	assert.Nil(t, schemaToSpanner.SchemaToSpannerDDL(conv, ToDdlImpl{}))
-	actual := conv.SpSchema[name]
+	actual := conv.SpSchema.Tables[name]
 	dropComments(&actual) // Don't test comment.
 	expected := ddl.CreateTable{
 		Name:   "t1",
@@ -121,7 +121,7 @@ func TestToSpannerPostgreSQLDialectType(t *testing.T) {
 	conv.Audit = audit
 	schemaToSpanner := common.SchemaToSpannerImpl{}
 	assert.Nil(t, schemaToSpanner.SchemaToSpannerDDL(conv, ToDdlImpl{}))
-	actual := conv.SpSchema["t1"]
+	actual := conv.SpSchema.Tables["t1"]
 	dropComments(&actual) // Don't test comment.
 	expected := ddl.CreateTable{
 		Name:   "test",

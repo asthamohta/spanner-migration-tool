@@ -71,15 +71,15 @@ func getMigrationDataSchemaPatterns(conv *internal.Conv, migrationData *migratio
 		numWarnings += int32(warnings)
 	}
 
-	for _, table := range conv.SpSchema {
+	for _, table := range conv.SpSchema.Tables {
 		numForeignKey += int32(len(table.ForeignKeys))
 		numIndexes += int32(len(table.Indexes))
 		depth := 0
 		tableId := table.Id
-		for conv.SpSchema[tableId].ParentId != "" {
+		for conv.SpSchema.Tables[tableId].ParentId != "" {
 			numInterleaves++
 			depth++
-			tableId = conv.SpSchema[tableId].ParentId
+			tableId = conv.SpSchema.Tables[tableId].ParentId
 		}
 		maxInterleaveDepth = int32(math.Max(float64(maxInterleaveDepth), float64(depth)))
 	}

@@ -1,7 +1,7 @@
 import IRule from './rule'
 
 export default interface IConv {
-  SpSchema: Record<string, ICreateTable>
+  SpSchema: Schema
   SyntheticPKeys: Record<string, ISyntheticPKey>
   SrcSchema: Record<string, ITable>
   SchemaIssues: Record<string, number>[]
@@ -92,6 +92,11 @@ export interface ISpannerForeignKey {
 }
 
 // source schema
+export interface Schema {
+  Tables: Record<string, ICreateTable>
+}
+
+// table schema
 export interface ICreateTable {
   Name: string
   ColIds: string[]

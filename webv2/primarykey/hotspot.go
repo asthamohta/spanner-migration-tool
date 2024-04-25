@@ -25,7 +25,7 @@ func DetectHotspot() {
 
 	sessionState := session.GetSessionState()
 
-	for _, spannerTable := range sessionState.Conv.SpSchema {
+	for _, spannerTable := range sessionState.Conv.SpSchema.Tables {
 
 		isHotSpot(spannerTable.PrimaryKeys, spannerTable)
 	}

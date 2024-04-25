@@ -30,7 +30,7 @@ import (
 // Conv contains all schema and data conversion state.
 type Conv struct {
 	mode               mode                     // Schema mode or data mode.
-	SpSchema           ddl.Schema               // Maps Spanner table name to Spanner schema.
+	SpSchema           ddl.Schema               // Maps Spanner database properties such as tables to Spanner schema.
 	SyntheticPKeys     map[string]SyntheticPKey // Maps Spanner table name to synthetic primary key (if needed).
 	SrcSchema          map[string]schema.Table  // Maps source-DB table name to schema information.
 	SchemaIssues       map[string]TableIssues   // Maps source-DB table/col to list of schema conversion issues.
@@ -434,14 +434,14 @@ func (conv *Conv) SampleBadRows(n int) []string {
 }
 
 func (conv *Conv) AddShardIdColumn() {
-	for t, ct := range conv.SpSchema {
+	for t, ct := range conv.SpSchema.Tables {
 		if ct.ShardIdColumn == "" {
 			colName := conv.buildColumnNameWithBase(t, ShardIdColumn)
 			columnId := GenerateColumnId()
 			ct.ColIds = append(ct.ColIds, columnId)
 			ct.ColDefs[columnId] = ddl.ColumnDef{Name: colName, Id: columnId, T: ddl.Type{Name: ddl.String, Len: 50}, NotNull: false}
 			ct.ShardIdColumn = columnId
-			conv.SpSchema[t] = ct
+			conv.SpSchema.Tables[t] = ct
 			var issues []SchemaIssue
 			issues = append(issues, ShardIdColumnAdded, ShardIdColumnPrimaryKey)
 			conv.SchemaIssues[ct.Id].ColumnLevelIssues[columnId] = issues
@@ -452,7 +452,7 @@ func (conv *Conv) AddShardIdColumn() {
 // AddPrimaryKeys analyzes all tables in conv.schema and adds synthetic primary
 // keys for any tables that don't have primary key.
 func (conv *Conv) AddPrimaryKeys() {
-	for t, ct := range conv.SpSchema {
+	for t, ct := range conv.SpSchema.Tables {
 		if len(ct.PrimaryKeys) == 0 {
 			primaryKeyPopulated := false
 			// Populating column with unique constraint as primary key in case
@@ -480,7 +480,7 @@ func (conv *Conv) AddPrimaryKeys() {
 				conv.SyntheticPKeys[t] = SyntheticPKey{columnId, 0}
 				addMissingPrimaryKeyWarning(ct.Id, columnId, conv, MissingPrimaryKey)
 			}
-			conv.SpSchema[t] = ct
+			conv.SpSchema.Tables[t] = ct
 		}
 	}
 }
@@ -507,7 +507,7 @@ func (conv *Conv) SetLocation(loc *time.Location) {
 }
 
 func (conv *Conv) buildColumnNameWithBase(tableId, base string) string {
-	if _, ok := conv.SpSchema[tableId]; !ok {
+	if _, ok := conv.SpSchema.Tables[tableId]; !ok {
 		conv.Unexpected(fmt.Sprintf("Table doesn't exist for tableId %s: ", tableId))
 		return base
 	}
@@ -516,7 +516,7 @@ func (conv *Conv) buildColumnNameWithBase(tableId, base string) string {
 	for {
 		// Check key isn't already a column in the table.
 		ok := true
-		for _, column := range conv.SpSchema[tableId].ColDefs {
+		for _, column := range conv.SpSchema.Tables[tableId].ColDefs {
 			if column.Name == key {
 				ok = false
 				break

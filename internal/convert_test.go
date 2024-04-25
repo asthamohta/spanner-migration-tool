@@ -270,17 +270,17 @@ func TestAddPrimaryKeys(t *testing.T) {
 	}
 	for _, tc := range addPrimaryKeyTests {
 		conv := MakeConv()
-		conv.SpSchema = tc.inputSchema
+		conv.SpSchema.Tables = tc.inputSchema
 		conv.AddPrimaryKeys()
 		if tc.expectedSchema != nil && tc.syntheticKey == "" {
-			assert.Equal(t, tc.expectedSchema["t1"], conv.SpSchema["t1"])
+			assert.Equal(t, tc.expectedSchema["t1"], conv.SpSchema.Tables["t1"])
 		}
 		if tc.uniqueKey != nil {
 			assert.Equal(t, tc.uniqueKey, conv.UniquePKey["t1"])
 		}
 		if tc.syntheticKey != "" {
-			AssertSpSchema(conv, t, tc.expectedSchema, conv.SpSchema)
-			assert.Equal(t, tc.syntheticKey, conv.SpSchema["t1"].ColDefs[conv.SyntheticPKeys["t1"].ColId].Name)
+			AssertSpSchema(conv, t, tc.expectedSchema, conv.SpSchema.Tables)
+			assert.Equal(t, tc.syntheticKey, conv.SpSchema.Tables["t1"].ColDefs[conv.SyntheticPKeys["t1"].ColId].Name)
 		}
 	}
 }

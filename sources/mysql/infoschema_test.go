@@ -383,7 +383,7 @@ func TestProcessData_MultiCol(t *testing.T) {
 			},
 			PrimaryKeys: []ddl.IndexKey{ddl.IndexKey{ColId: "synth_id", Order: 1}}},
 	}
-	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema))
+	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 	columnLevelIssues := map[string][]internal.SchemaIssue{
 		"c48": []internal.SchemaIssue{
 			2,
@@ -473,7 +473,7 @@ func TestProcessSchema_Sharded(t *testing.T) {
 			},
 			PrimaryKeys: []ddl.IndexKey{{ColId: "synth_id", Order: 1}}},
 	}
-	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema))
+	internal.AssertSpSchema(conv, t, expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 }
 
 func TestSetRowStats(t *testing.T) {

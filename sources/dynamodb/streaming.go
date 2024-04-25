@@ -348,7 +348,7 @@ func ProcessRecord(conv *internal.Conv, streamInfo *StreamingInfo, record *dynam
 	// todo - write a function that will compute schemas and colums and return
 	tableId, err := internal.GetTableIdFromSrcName(conv.SrcSchema, srcTable)
 	srcSchema, ok1 := conv.SrcSchema[tableId]
-	spSchema, ok2 := conv.SpSchema[tableId]
+	spSchema, ok2 := conv.SpSchema.Tables[tableId]
 	if err != nil || !ok1 || !ok2 {
 		streamInfo.Unexpected(fmt.Sprintf("Can't get tableId and schemas for table %s: %v", srcTable, err))
 		return

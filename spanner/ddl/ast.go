@@ -342,7 +342,7 @@ func (ct CreateTable) PrintCreateTable(spSchema Schema, config Config) string {
 
 	var interleave string
 	if ct.ParentId != "" {
-		parent := spSchema[ct.ParentId].Name
+		parent := spSchema.Tables[ct.ParentId].Name
 		if config.SpDialect == constants.DIALECT_POSTGRESQL {
 			// PG spanner only supports PRIMARY KEY() inside the CREATE TABLE()
 			// and thus INTERLEAVE follows immediately after closing brace.
@@ -425,22 +425,26 @@ func isStoredColumnKeyPartOfPrimaryKey(ct CreateTable, colId string) bool {
 func (k Foreignkey) PrintForeignKeyAlterTable(spannerSchema Schema, c Config, tableId string) string {
 	var cols, referCols []string
 	for i, col := range k.ColIds {
-		cols = append(cols, spannerSchema[tableId].ColDefs[col].Name)
-		referCols = append(referCols, spannerSchema[k.ReferTableId].ColDefs[k.ReferColumnIds[i]].Name)
+		cols = append(cols, spannerSchema.Tables[tableId].ColDefs[col].Name)
+		referCols = append(referCols, spannerSchema.Tables[k.ReferTableId].ColDefs[k.ReferColumnIds[i]].Name)
 	}
 	var s string
 	if k.Name != "" {
 		s = fmt.Sprintf("CONSTRAINT %s ", c.quote(k.Name))
 	}
-	return fmt.Sprintf("ALTER TABLE %s ADD %sFOREIGN KEY (%s) REFERENCES %s (%s)", c.quote(spannerSchema[tableId].Name), s, strings.Join(cols, ", "), c.quote(spannerSchema[k.ReferTableId].Name), strings.Join(referCols, ", "))
+	return fmt.Sprintf("ALTER TABLE %s ADD %sFOREIGN KEY (%s) REFERENCES %s (%s)", c.quote(spannerSchema.Tables[tableId].Name), s, strings.Join(cols, ", "), c.quote(spannerSchema.Tables[k.ReferTableId].Name), strings.Join(referCols, ", "))
 }
 
-// Schema stores a map of table names and Tables.
-type Schema map[string]CreateTable
+type Schema struct {
+	Tables map[string]CreateTable
+}
 
 // NewSchema creates a new Schema object.
 func NewSchema() Schema {
-	return make(map[string]CreateTable)
+	tables := make(map[string]CreateTable)
+	return Schema{
+		Tables: tables,
+	}
 }
 
 // Tables are ordered in alphabetical order with one exception: interleaved
@@ -452,7 +456,7 @@ func GetSortedTableIdsBySpName(s Schema) []string {
 
 	var tableNames, sortedTableNames, sortedTableIds []string
 	tableNameIdMap := map[string]string{}
-	for _, t := range s {
+	for _, t := range s.Tables {
 		tableNames = append(tableNames, t.Name)
 		tableNameIdMap[t.Name] = t.Id
 	}
@@ -462,17 +466,17 @@ func GetSortedTableIdsBySpName(s Schema) []string {
 	tableAdded := make(map[string]bool)
 	for len(tableQueue) > 0 {
 		tableName := tableQueue[0]
-		table := s[tableNameIdMap[tableName]]
+		table := s.Tables[tableNameIdMap[tableName]]
 		tableQueue = tableQueue[1:]
 		parentTableExists := false
 		if table.ParentId != "" {
-			_, parentTableExists = s[table.ParentId]
+			_, parentTableExists = s.Tables[table.ParentId]
 		}
 
 		// Add table t if either:
 		// a) t is not interleaved in another table, or
 		// b) t is interleaved in another table and that table has already been added to the list.
-		if table.ParentId == "" || tableAdded[s[table.ParentId].Name] || !parentTableExists {
+		if table.ParentId == "" || tableAdded[s.Tables[table.ParentId].Name] || !parentTableExists {
 			sortedTableNames = append(sortedTableNames, tableName)
 			tableAdded[tableName] = true
 		} else {
@@ -501,9 +505,9 @@ func (s Schema) GetDDL(c Config) []string {
 
 	if c.Tables {
 		for _, tableId := range tableIds {
-			ddl = append(ddl, s[tableId].PrintCreateTable(s, c))
-			for _, index := range s[tableId].Indexes {
-				ddl = append(ddl, index.PrintCreateIndex(s[tableId], c))
+			ddl = append(ddl, s.Tables[tableId].PrintCreateTable(s, c))
+			for _, index := range s.Tables[tableId].Indexes {
+				ddl = append(ddl, index.PrintCreateIndex(s.Tables[tableId], c))
 			}
 		}
 	}
@@ -515,7 +519,7 @@ func (s Schema) GetDDL(c Config) []string {
 	// of circular foreign keys definitions. We opt for simplicity.
 	if c.ForeignKeys {
 		for _, t := range tableIds {
-			for _, fk := range s[t].ForeignKeys {
+			for _, fk := range s.Tables[t].ForeignKeys {
 				ddl = append(ddl, fk.PrintForeignKeyAlterTable(s, c, t))
 			}
 		}
@@ -525,7 +529,7 @@ func (s Schema) GetDDL(c Config) []string {
 
 // CheckInterleaved checks if schema contains interleaved tables.
 func (s Schema) CheckInterleaved() bool {
-	for _, table := range s {
+	for _, table := range s.Tables {
 		if table.ParentId != "" {
 			return true
 		}

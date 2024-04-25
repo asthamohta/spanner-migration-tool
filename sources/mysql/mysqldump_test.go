@@ -67,7 +67,7 @@ func TestProcessMySQLDump_Scalar(t *testing.T) {
 			tableId, _ := internal.GetTableIdFromSrcName(conv.SrcSchema, "t")
 			columnId, _ := internal.GetColIdFromSrcName(conv.SrcSchema[tableId].ColDefs, "a")
 			noIssues(conv, t, "Scalar type: "+tc.ty)
-			assert.Equal(t, conv.SpSchema[tableId].ColDefs[columnId].T, tc.expected, "Scalar type: "+tc.ty)
+			assert.Equal(t, conv.SpSchema.Tables[tableId].ColDefs[columnId].T, tc.expected, "Scalar type: "+tc.ty)
 		})
 	}
 }
@@ -89,9 +89,9 @@ func TestProcessMySQLDump_SingleCol(t *testing.T) {
 			noIssues(conv, t, "Not null: "+tc.ty)
 			tableId, err := internal.GetTableIdFromSpName(conv.SpSchema, "t")
 			assert.Equal(t, nil, err)
-			colId, err := internal.GetColIdFromSpName(conv.SpSchema[tableId].ColDefs, "a")
+			colId, err := internal.GetColIdFromSpName(conv.SpSchema.Tables[tableId].ColDefs, "a")
 			assert.Equal(t, nil, err)
-			cd := conv.SpSchema[tableId].ColDefs[colId]
+			cd := conv.SpSchema.Tables[tableId].ColDefs[colId]
 			cd.Comment = ""
 			cd.Id = ""
 			assert.Equal(t, tc.expected, cd, "Not null: "+tc.ty)
@@ -778,7 +778,7 @@ func TestProcessMySQLDump_MultiCol(t *testing.T) {
 				noIssues(conv, t, tc.name)
 			}
 			if tc.expectedSchema != nil {
-				internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema))
+				internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 			}
 			if tc.expectedData != nil {
 				assert.Equal(t, tc.expectedData, rows, tc.name+": Data rows did not match")
@@ -914,7 +914,7 @@ func TestProcessMySQLDump_AddPrimaryKeys(t *testing.T) {
 			conv, _ := runProcessMySQLDump(tc.input)
 			conv.AddPrimaryKeys()
 			if tc.expectedSchema != nil {
-				internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema))
+				internal.AssertSpSchema(conv, t, tc.expectedSchema, stripSchemaComments(conv.SpSchema.Tables))
 			}
 		})
 	}

@@ -53,7 +53,7 @@ func UpdateColumnType(newType, tableId, colId string, conv *internal.Conv, w htt
 }
 
 func updateColumnTypeForReferredTable(newType, tableId, colId string, conv *internal.Conv, w http.ResponseWriter) error {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 	for _, fk := range sp.ForeignKeys {
 		fkReferColPosition := getFkColumnPosition(fk.ColIds, colId)
 		if fkReferColPosition == -1 {
@@ -72,7 +72,7 @@ func updateColumnTypeForReferredTable(newType, tableId, colId string, conv *inte
 }
 
 func updateColumnTypeForReferringTable(newType, tableId, colId string, conv *internal.Conv, w http.ResponseWriter) error {
-	for _, sp := range conv.SpSchema {
+	for _, sp := range conv.SpSchema.Tables {
 		for j := 0; j < len(sp.ForeignKeys); j++ {
 			if sp.ForeignKeys[j].ReferTableId == tableId {
 				fkColPosition := getFkColumnPosition(sp.ForeignKeys[j].ReferColumnIds, colId)
@@ -94,7 +94,7 @@ func updateColumnTypeForReferringTable(newType, tableId, colId string, conv *int
 }
 
 func updateColumnTypeForChildTable(newType, tableId, colId string, conv *internal.Conv, w http.ResponseWriter) {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
 	isParent, childTableId := utilities.IsParent(tableId)
 	if isParent {
@@ -110,9 +110,9 @@ func updateColumnTypeForChildTable(newType, tableId, colId string, conv *interna
 }
 
 func updateColumnTypeForParentTable(newType, tableId, colId string, conv *internal.Conv, w http.ResponseWriter) {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
-	parentTableId := conv.SpSchema[tableId].ParentId
+	parentTableId := conv.SpSchema.Tables[tableId].ParentId
 	if parentTableId != "" {
 		parentColId, err := utilities.GetColIdFromSpannerName(conv, parentTableId, sp.ColDefs[colId].Name)
 		if err == nil {
@@ -135,7 +135,7 @@ func UpdateColumnSize(newSize, tableId, colId string, conv *internal.Conv) {
 }
 
 func updateColumnSizeForChildTable(newSize, tableId, colId string, conv *internal.Conv) {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 	isParent, childTableId := utilities.IsParent(tableId)
 	if isParent {
 		childColId, err := utilities.GetColIdFromSpannerName(conv, childTableId, sp.ColDefs[colId].Name)
@@ -147,8 +147,8 @@ func updateColumnSizeForChildTable(newSize, tableId, colId string, conv *interna
 }
 
 func updateColumnSizeForParentTable(newSize, tableId, colId string, conv *internal.Conv) {
-	sp := conv.SpSchema[tableId]
-	parentTableId := conv.SpSchema[tableId].ParentId
+	sp := conv.SpSchema.Tables[tableId]
+	parentTableId := conv.SpSchema.Tables[tableId].ParentId
 	if parentTableId != "" {
 		parentColId, err := utilities.GetColIdFromSpannerName(conv, parentTableId, sp.ColDefs[colId].Name)
 		if err == nil {
@@ -160,7 +160,7 @@ func updateColumnSizeForParentTable(newSize, tableId, colId string, conv *intern
 
 // UpdateColumnSizeTableSchema updates column size to newSize for a column of a table.
 func UpdateColumnSizeChangeTableSchema(conv *internal.Conv, tableId string, colId string, newSize string) {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 	spColDef := sp.ColDefs[colId]
 	len := int64(0)
 	if strings.ToLower(newSize) == "max" {
@@ -170,7 +170,7 @@ func UpdateColumnSizeChangeTableSchema(conv *internal.Conv, tableId string, colI
 	}
 	spColDef.T.Len = len
 	sp.ColDefs[colId] = spColDef
-	conv.SpSchema[tableId] = sp
+	conv.SpSchema.Tables[tableId] = sp
 }
 
 // UpdateColumnTypeTableSchema updates column type to newtype for a column of a table.

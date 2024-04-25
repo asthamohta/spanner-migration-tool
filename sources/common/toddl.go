@@ -144,7 +144,7 @@ func (ss *SchemaToSpannerImpl) SchemaToSpannerDDLHelper(conv *internal.Conv, tod
 		ColumnLevelIssues: columnLevelIssues,
 	}
 	comment := "Spanner schema for source table " + quoteIfNeeded(srcTable.Name)
-	conv.SpSchema[srcTable.Id] = ddl.CreateTable{
+	conv.SpSchema.Tables[srcTable.Id] = ddl.CreateTable{
 		Name:        spTableName,
 		ColIds:      spColIds,
 		ColDefs:     spColDef,
@@ -193,7 +193,7 @@ func CvtForeignKeysHelper(conv *internal.Conv, spTableName string, srcTableId st
 	}
 
 	// check whether spanner refer table exist or not.
-	_, isPresent := conv.SpSchema[srcKey.ReferTableId]
+	_, isPresent := conv.SpSchema.Tables[srcKey.ReferTableId]
 	if !isPresent && isRestore {
 		return ddl.Foreignkey{}, nil
 	}
@@ -239,13 +239,13 @@ func SrcTableToSpannerDDL(conv *internal.Conv, toddl ToDdl, srcTable schema.Tabl
 		return err
 	}
 	for tableId, sourceTable := range conv.SrcSchema {
-		if _, isPresent := conv.SpSchema[tableId]; !isPresent {
+		if _, isPresent := conv.SpSchema.Tables[tableId]; !isPresent {
 			continue
 		}
-		spTable := conv.SpSchema[tableId]
+		spTable := conv.SpSchema.Tables[tableId]
 		if tableId != srcTable.Id {
 			spTable.ForeignKeys = cvtForeignKeysForAReferenceTable(conv, tableId, srcTable.Id, sourceTable.ForeignKeys, spTable.ForeignKeys)
-			conv.SpSchema[tableId] = spTable
+			conv.SpSchema.Tables[tableId] = spTable
 		}
 	}
 	internal.ResolveRefs(conv)
@@ -255,7 +255,7 @@ func SrcTableToSpannerDDL(conv *internal.Conv, toddl ToDdl, srcTable schema.Tabl
 func cvtForeignKeysForAReferenceTable(conv *internal.Conv, tableId string, referTableId string, srcKeys []schema.ForeignKey, spKeys []ddl.Foreignkey) []ddl.Foreignkey {
 	for _, key := range srcKeys {
 		if key.ReferTableId == referTableId {
-			spKey, err := CvtForeignKeysHelper(conv, conv.SpSchema[tableId].Name, tableId, key, true)
+			spKey, err := CvtForeignKeysHelper(conv, conv.SpSchema.Tables[tableId].Name, tableId, key, true)
 			if err != nil {
 				continue
 			}

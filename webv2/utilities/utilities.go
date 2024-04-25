@@ -175,7 +175,7 @@ func IsTypeChanged(newType, tableId, colId string, conv *internal.Conv) (bool, e
 func IsPartOfPK(col, table string) bool {
 	sessionState := session.GetSessionState()
 
-	for _, pk := range sessionState.Conv.SpSchema[table].PrimaryKeys {
+	for _, pk := range sessionState.Conv.SpSchema.Tables[table].PrimaryKeys {
 		if pk.ColId == col {
 			return true
 		}
@@ -186,7 +186,7 @@ func IsPartOfPK(col, table string) bool {
 func IsPartOfSecondaryIndex(col, table string) (bool, string) {
 	sessionState := session.GetSessionState()
 
-	for _, index := range sessionState.Conv.SpSchema[table].Indexes {
+	for _, index := range sessionState.Conv.SpSchema.Tables[table].Indexes {
 		for _, key := range index.Keys {
 			if key.ColId == col {
 				return true, index.Name
@@ -199,7 +199,7 @@ func IsPartOfSecondaryIndex(col, table string) (bool, string) {
 func IsPartOfFK(col, table string) bool {
 	sessionState := session.GetSessionState()
 
-	for _, fk := range sessionState.Conv.SpSchema[table].ForeignKeys {
+	for _, fk := range sessionState.Conv.SpSchema.Tables[table].ForeignKeys {
 		for _, column := range fk.ColIds {
 			if column == col {
 				return true
@@ -212,7 +212,7 @@ func IsPartOfFK(col, table string) bool {
 func IsReferencedByFK(col, table string) (bool, string) {
 	sessionState := session.GetSessionState()
 
-	for _, spSchema := range sessionState.Conv.SpSchema {
+	for _, spSchema := range sessionState.Conv.SpSchema.Tables {
 		if table != spSchema.Name {
 			for _, fk := range spSchema.ForeignKeys {
 				if fk.ReferTableId == table {
@@ -348,7 +348,7 @@ func UpdateMaxColumnLen(conv *internal.Conv, dataType, tableId, colId string, sp
 	if err != nil {
 		return err
 	}
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 	// update column size of child table.
 	isParent, childTableId := IsParent(tableId)
 	if isParent {
@@ -362,7 +362,7 @@ func UpdateMaxColumnLen(conv *internal.Conv, dataType, tableId, colId string, sp
 	}
 
 	// update column size of parent table.
-	parentTableId := conv.SpSchema[tableId].ParentId
+	parentTableId := conv.SpSchema.Tables[tableId].ParentId
 	if parentTableId != "" {
 		parentColId, err := GetColIdFromSpannerName(conv, parentTableId, sp.ColDefs[colId].Name)
 		if err == nil {
@@ -376,7 +376,7 @@ func UpdateMaxColumnLen(conv *internal.Conv, dataType, tableId, colId string, sp
 }
 
 func GetColIdFromSpannerName(conv *internal.Conv, tableId, colName string) (string, error) {
-	for _, col := range conv.SpSchema[tableId].ColDefs {
+	for _, col := range conv.SpSchema.Tables[tableId].ColDefs {
 		if col.Name == colName {
 			return col.Id, nil
 		}
@@ -387,7 +387,7 @@ func GetColIdFromSpannerName(conv *internal.Conv, tableId, colName string) (stri
 func IsParent(tableId string) (bool, string) {
 	sessionState := session.GetSessionState()
 
-	for _, spSchema := range sessionState.Conv.SpSchema {
+	for _, spSchema := range sessionState.Conv.SpSchema.Tables {
 		if spSchema.ParentId == tableId {
 			return true, spSchema.Id
 		}

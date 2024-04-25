@@ -93,7 +93,7 @@ func GetTableIdFromSrcName(srcSchema map[string]schema.Table, tableName string) 
 }
 
 func GetTableIdFromSpName(spSchema ddl.Schema, tableName string) (string, error) {
-	for tableId, table := range spSchema {
+	for tableId, table := range spSchema.Tables {
 		if tableName == table.Name {
 			return tableId, nil
 		}
@@ -130,7 +130,7 @@ func GetSrcIndexFromId(indexes []schema.Index, indexId string) (schema.Index, er
 
 func ComputeUsedNames(conv *Conv) map[string]bool {
 	usedNames := make(map[string]bool)
-	for _, table := range conv.SpSchema {
+	for _, table := range conv.SpSchema.Tables {
 		usedNames[strings.ToLower(table.Name)] = true
 		for _, index := range table.Indexes {
 			usedNames[strings.ToLower(index.Name)] = true

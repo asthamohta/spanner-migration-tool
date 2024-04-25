@@ -229,7 +229,7 @@ func Test_cvtIndexes(t *testing.T) {
 		},
 		UsedNames: map[string]bool{},
 		SpSchema: ddl.Schema{
-			"t1": ddl.CreateTable{
+			Tables: map[string]ddl.CreateTable{"t1": ddl.CreateTable{
 				Name:   "table1",
 				ColIds: []string{"c1", "c2", "c3"},
 				ColDefs: map[string]ddl.ColumnDef{
@@ -238,7 +238,7 @@ func Test_cvtIndexes(t *testing.T) {
 					"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: 255}},
 				},
 				Id: "t1",
-			},
+			}},
 		},
 	}
 
@@ -268,7 +268,7 @@ func Test_cvtIndexes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := cvtIndexes(tt.args.conv, tt.args.tableId, tt.args.srcIndexes, tt.args.spColIds, tt.args.conv.SpSchema[tt.args.tableId].ColDefs)
+			got := cvtIndexes(tt.args.conv, tt.args.tableId, tt.args.srcIndexes, tt.args.spColIds, tt.args.conv.SpSchema.Tables[tt.args.tableId].ColDefs)
 			if !reflect.DeepEqual(got, tt.ExpectedSpIndexes) {
 				t.Errorf("cvtIndexes() = %v and wants %v", got, tt.ExpectedSpIndexes)
 			}
@@ -300,15 +300,16 @@ func Test_cvtForeignKeysForAReferenceTable(t *testing.T) {
 		},
 		UsedNames: map[string]bool{},
 		SpSchema: ddl.Schema{
-			"t2": ddl.CreateTable{
-				Name:   "table2",
-				ColIds: []string{"c3"},
-				ColDefs: map[string]ddl.ColumnDef{
-					"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: 255}},
+			Tables: map[string]ddl.CreateTable{
+				"t2": ddl.CreateTable{
+					Name:   "table2",
+					ColIds: []string{"c3"},
+					ColDefs: map[string]ddl.ColumnDef{
+						"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: 255}},
+					},
+					Id: "t2",
 				},
-				Id: "t2",
-			},
-		},
+			}},
 	}
 	tableId := "t2"
 	referTableId := "t2"

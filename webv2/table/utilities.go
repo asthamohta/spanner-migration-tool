@@ -234,7 +234,7 @@ func updateInterleaveTableSchema(conv *internal.Conv, interleaveTableSchema []In
 
 func UpdateNotNull(notNullChange, tableId, colId string, conv *internal.Conv) {
 
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
 	switch notNullChange {
 	case NotNullAdded:

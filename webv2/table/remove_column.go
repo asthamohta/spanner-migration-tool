@@ -23,27 +23,27 @@ import (
 // removeColumn remove given column from schema.
 func RemoveColumn(tableId string, colId string, conv *internal.Conv) {
 
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
 	// remove interleaving if the column to be removed is used in interleaving.
 	isParent, childTableId := utilities.IsParent(tableId)
 	if isParent {
-		if isColFistOderPk(conv.SpSchema[tableId].PrimaryKeys, colId) {
-			childSp := conv.SpSchema[childTableId]
+		if isColFistOderPk(conv.SpSchema.Tables[tableId].PrimaryKeys, colId) {
+			childSp := conv.SpSchema.Tables[childTableId]
 			childSp.ParentId = ""
-			conv.SpSchema[childTableId] = childSp
+			conv.SpSchema.Tables[childTableId] = childSp
 		}
 	}
 
-	if conv.SpSchema[tableId].ParentId != "" {
-		if isColFistOderPk(conv.SpSchema[tableId].PrimaryKeys, colId) {
+	if conv.SpSchema.Tables[tableId].ParentId != "" {
+		if isColFistOderPk(conv.SpSchema.Tables[tableId].PrimaryKeys, colId) {
 			sp.ParentId = ""
-			conv.SpSchema[tableId] = sp
+			conv.SpSchema.Tables[tableId] = sp
 		}
 	}
 
 	// remove foreign keys from refer tables.
-	for id, sp := range conv.SpSchema {
+	for id, sp := range conv.SpSchema.Tables {
 		var updatedFks []ddl.Foreignkey
 		for j := 0; j < len(sp.ForeignKeys); j++ {
 			if sp.ForeignKeys[j].ReferTableId == tableId {
@@ -59,7 +59,7 @@ func RemoveColumn(tableId string, colId string, conv *internal.Conv) {
 		}
 
 		sp.ForeignKeys = updatedFks
-		conv.SpSchema[id] = sp
+		conv.SpSchema.Tables[id] = sp
 	}
 
 	//remove column from the table.
@@ -69,7 +69,7 @@ func RemoveColumn(tableId string, colId string, conv *internal.Conv) {
 
 // removeColumnFromCurrentTableSchema remove given column from table schema.
 func removeColumnFromTableSchema(conv *internal.Conv, tableId string, colId string) {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
 	sp = removeColumnFromSpannerColDefs(sp, colId)
 
@@ -85,7 +85,7 @@ func removeColumnFromTableSchema(conv *internal.Conv, tableId string, colId stri
 
 	removeSpannerSchemaIssue(tableId, colId, conv)
 
-	conv.SpSchema[tableId] = sp
+	conv.SpSchema.Tables[tableId] = sp
 }
 
 // removeColumnFromSpannerColNames remove given column from ColNames.

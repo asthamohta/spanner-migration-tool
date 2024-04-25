@@ -2,6 +2,7 @@ import IConv from "src/app/model/conv";
 
 const mockIConv: IConv = {
     SpSchema: {
+        Tables: {
         "t1": {
             Name: "table1",
             Id: "t1",
@@ -39,7 +40,7 @@ const mockIConv: IConv = {
             ],
             ParentId: "",
             Comment: ""
-        }
+        }}
     },
     SyntheticPKeys: {},
     SrcSchema: {
@@ -110,6 +111,7 @@ const mockIConv: IConv = {
 
 export const mockIConv2: IConv = {
     SpSchema: {
+        Tables:{
         "t1": {
             Name: "table1",
             Id: "t1",
@@ -160,7 +162,7 @@ export const mockIConv2: IConv = {
             Indexes: [],
             ParentId: "",
             Comment: ""
-        }
+        }}
     },
     SyntheticPKeys: {},
     SrcSchema: {

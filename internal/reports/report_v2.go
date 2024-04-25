@@ -124,7 +124,7 @@ func fetchStatementStats(driverName string, conv *internal.Conv) (statementStats
 }
 
 func fetchNameChanges(conv *internal.Conv) (nameChanges []NameChange) {
-	for tableId, spTable := range conv.SpSchema {
+	for tableId, spTable := range conv.SpSchema.Tables {
 		srcTable := conv.SrcSchema[tableId]
 		if srcTable.Name != spTable.Name {
 			nameChanges = append(nameChanges, NameChange{NameChangeType: "TableName", SourceTable: srcTable.Name, OldName: srcTable.Name, NewName: spTable.Name})
@@ -138,7 +138,7 @@ func fetchNameChanges(conv *internal.Conv) (nameChanges []NameChange) {
 				nameChanges = append(nameChanges, NameChange{NameChangeType: "ColumnName", SourceTable: srcTable.Name, OldName: srcCol.Name, NewName: spCol.Name})
 			}
 		}
-		for _, spFk := range conv.SpSchema[tableId].ForeignKeys {
+		for _, spFk := range conv.SpSchema.Tables[tableId].ForeignKeys {
 			srcFk, err := internal.GetSrcFkFromId(conv.SrcSchema[tableId].ForeignKeys, spFk.Id)
 			if err != nil {
 				continue
@@ -147,7 +147,7 @@ func fetchNameChanges(conv *internal.Conv) (nameChanges []NameChange) {
 				nameChanges = append(nameChanges, NameChange{NameChangeType: "ForeignKey", SourceTable: srcTable.Name, OldName: srcFk.Name, NewName: spFk.Name})
 			}
 		}
-		for _, spIdx := range conv.SpSchema[tableId].Indexes {
+		for _, spIdx := range conv.SpSchema.Tables[tableId].Indexes {
 			srcIdx, err := internal.GetSrcIndexFromId(conv.SrcSchema[tableId].Indexes, spIdx.Id)
 			if err != nil {
 				continue

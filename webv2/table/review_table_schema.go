@@ -100,9 +100,9 @@ func ReviewTableSchema(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		if v.Rename != "" && v.Rename != conv.SpSchema[tableId].ColDefs[colId].Name {
+		if v.Rename != "" && v.Rename != conv.SpSchema.Tables[tableId].ColDefs[colId].Name {
 
-			for _, c := range conv.SpSchema[tableId].ColDefs {
+			for _, c := range conv.SpSchema.Tables[tableId].ColDefs {
 				if strings.EqualFold(c.Name, v.Rename) {
 					http.Error(w, fmt.Sprintf("Multiple columns with similar name cannot exist for column : %v", v.Rename), http.StatusBadRequest)
 					return
@@ -143,13 +143,13 @@ func ReviewTableSchema(w http.ResponseWriter, r *http.Request) {
 			} else {
 				colMaxLength, _ = strconv.ParseInt(v.MaxColLength, 10, 64)
 			}
-			if conv.SpSchema[tableId].ColDefs[colId].T.Len != colMaxLength {
+			if conv.SpSchema.Tables[tableId].ColDefs[colId].T.Len != colMaxLength {
 				interleaveTableSchema = ReviewColumnSize(colMaxLength, tableId, colId, conv, interleaveTableSchema)
 			}
 		}
 	}
 
-	ddl := GetSpannerTableDDL(conv.SpSchema[tableId], conv.SpDialect, sessionState.Driver)
+	ddl := GetSpannerTableDDL(conv.SpSchema.Tables[tableId], conv.SpDialect, sessionState.Driver)
 
 	interleaveTableSchema = trimRedundantInterleaveTableSchema(interleaveTableSchema)
 	// update interleaveTableSchema by filling the missing fields.

@@ -85,9 +85,9 @@ func (ps* ProcessSchemaImpl) ProcessSchema(conv *internal.Conv, infoSchema InfoS
 	uo.initPrimaryKeyOrder(conv)
 	uo.initIndexOrder(conv)
 	s.SchemaToSpannerDDL(conv, infoSchema.GetToDdl())
-	if tableCount != len(conv.SpSchema) {
-		fmt.Printf("Failed to load all the source tables, source table count: %v, processed tables:%v. Please retry connecting to the source database to load tables.\n", tableCount, len(conv.SpSchema))
-		return fmt.Errorf("failed to load all the source tables, source table count: %v, processed tables:%v. Please retry connecting to the source database to load tables.", tableCount, len(conv.SpSchema))
+	if tableCount != len(conv.SpSchema.Tables) {
+		fmt.Printf("Failed to load all the source tables, source table count: %v, processed tables:%v. Please retry connecting to the source database to load tables.\n", tableCount, len(conv.SpSchema.Tables))
+		return fmt.Errorf("failed to load all the source tables, source table count: %v, processed tables:%v. Please retry connecting to the source database to load tables.", tableCount, len(conv.SpSchema.Tables))
 	}
 	conv.AddPrimaryKeys()
 	if attributes.IsSharded {
@@ -140,7 +140,7 @@ func (is *InfoSchemaImpl) ProcessData(conv *internal.Conv, infoSchema InfoSchema
 
 	for _, tableId := range tableIds {
 		srcSchema := conv.SrcSchema[tableId]
-		spSchema, ok := conv.SpSchema[tableId]
+		spSchema, ok := conv.SpSchema.Tables[tableId]
 		if !ok {
 			conv.Stats.BadRows[srcSchema.Name] += conv.Stats.Rows[srcSchema.Name]
 			conv.Unexpected(fmt.Sprintf("Can't get cols and schemas for table %s:ok=%t",
@@ -227,7 +227,7 @@ func (is *InfoSchemaImpl) processTable(conv *internal.Conv, table SchemaAndName,
 // from the source database that need to be migrated.
 func (is *InfoSchemaImpl) GetIncludedSrcTablesFromConv(conv *internal.Conv) (schemaToTablesMap map[string]internal.SchemaDetails, err error) {
 	schemaToTablesMap = make(map[string]internal.SchemaDetails)
-	for spTable := range conv.SpSchema {
+	for spTable := range conv.SpSchema.Tables {
 		//lookup the spanner table in the source tables via ID
 		srcTable, ok := conv.SrcSchema[spTable]
 		if !ok {

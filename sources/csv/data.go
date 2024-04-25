@@ -49,7 +49,7 @@ func (c *CsvImpl) GetCSVFiles(conv *internal.Conv, sourceProfile profiles.Source
 	// in table_name.csv format.
 	if sourceProfile.Csv.Manifest == "" {
 		fmt.Println("Manifest file not provided, checking for files named `[table_name].csv` in current working directory...")
-		for _, schema := range conv.SpSchema {
+		for _, schema := range conv.SpSchema.Tables {
 			tables = append(tables, utils.ManifestTable{Table_name: schema.Name, File_patterns: []string{fmt.Sprintf("%s.csv", schema.Name)}})
 		}
 	} else {
@@ -143,8 +143,8 @@ func (c *CsvImpl) SetRowStats(conv *internal.Conv, tables []utils.ManifestTable,
 				return fmt.Errorf("table Id not found for spanner table %v", table.Table_name)
 			}
 			colNames := []string{}
-			for _, colIds := range conv.SpSchema[tableId].ColIds {
-				colNames = append(colNames, conv.SpSchema[tableId].ColDefs[colIds].Name)
+			for _, colIds := range conv.SpSchema.Tables[tableId].ColIds {
+				colNames = append(colNames, conv.SpSchema.Tables[tableId].ColDefs[colIds].Name)
 			}
 			count, err := getCSVDataRowCount(r, colNames)
 			if err != nil {
@@ -200,7 +200,7 @@ func (c *CsvImpl) ProcessCSV(conv *internal.Conv, tables []utils.ManifestTable, 
 	}
 	orderedTables := []utils.ManifestTable{}
 	for _, id := range tableIds {
-		orderedTables = append(orderedTables, utils.ManifestTable{conv.SpSchema[id].Name, nameToFiles[conv.SpSchema[id].Name]})
+		orderedTables = append(orderedTables, utils.ManifestTable{conv.SpSchema.Tables[id].Name, nameToFiles[conv.SpSchema.Tables[id].Name]})
 	}
 
 	for _, table := range orderedTables {
@@ -219,8 +219,8 @@ func (c *CsvImpl) ProcessCSV(conv *internal.Conv, tables []utils.ManifestTable, 
 			}
 
 			colNames := []string{}
-			for _, v := range conv.SpSchema[tableId].ColIds {
-				colNames = append(colNames, conv.SpSchema[tableId].ColDefs[v].Name)
+			for _, v := range conv.SpSchema.Tables[tableId].ColIds {
+				colNames = append(colNames, conv.SpSchema.Tables[tableId].ColDefs[v].Name)
 			}
 
 			srcCols, err := r.Read()
@@ -280,13 +280,13 @@ func convertData(conv *internal.Conv, nullStr, tableName string, srcCols []strin
 		return cvtCols, v, fmt.Errorf("table Id not found for spanner table %v", tableName)
 	}
 
-	colDefs := conv.SpSchema[tableId].ColDefs
+	colDefs := conv.SpSchema.Tables[tableId].ColDefs
 	for i, val := range values {
 		if val == nullStr {
 			continue
 		}
 		colName := srcCols[i]
-		colId, err := internal.GetColIdFromSpName(conv.SpSchema[tableId].ColDefs, colName)
+		colId, err := internal.GetColIdFromSpName(conv.SpSchema.Tables[tableId].ColDefs, colName)
 		if err != nil {
 			return cvtCols, v, fmt.Errorf("column Id not found for spanner table %v column %v", tableName, colName)
 		}

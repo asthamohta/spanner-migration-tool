@@ -42,7 +42,7 @@ export class EditColumnMaxLengthComponent implements OnInit {
       next: (res: IConv) => {
         this.conv = res
         this.tableNames = Object.keys(res.SpSchema).map(
-          (talbeId: string) => res.SpSchema[talbeId].Name
+          (talbeId: string) => res.SpSchema.Tables[talbeId].Name
         )
         this.tableNames.push('All tables')
         if (this.conv.SpDialect === Dialect.PostgreSQLDialect) {

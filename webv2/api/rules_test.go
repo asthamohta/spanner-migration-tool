@@ -18,7 +18,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestApplyRule(t *testing.T) {
 	tcAddIndex := []struct {
 		name         string
@@ -44,30 +43,32 @@ func TestApplyRule(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
-							{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
+								{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
 				UsedNames: map[string]bool{"table1": true, "idx1": true, "idx2": true},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
-							{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
-							{Id: "i1", Name: "idx3", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}},
-						},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
+								{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
+								{Id: "i1", Name: "idx3", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}},
+							},
+						}}},
 			},
 		},
 		{
@@ -87,13 +88,14 @@ func TestApplyRule(t *testing.T) {
 			},
 			statusCode: http.StatusInternalServerError,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
-							{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
+								{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
@@ -117,13 +119,14 @@ func TestApplyRule(t *testing.T) {
 			},
 			statusCode: http.StatusInternalServerError,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
-							{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
+								{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
@@ -142,13 +145,14 @@ func TestApplyRule(t *testing.T) {
 			},
 			statusCode: http.StatusInternalServerError,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
-							{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{{Name: "idx1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false}}},
+								{Name: "idx2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}}},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
@@ -376,7 +380,7 @@ func TestApplyRule(t *testing.T) {
 		}
 
 		if tc.statusCode == http.StatusOK {
-			assert.Equal(t, tc.expectedSchema, res.SpSchema["t1"])
+			assert.Equal(t, tc.expectedSchema, res.SpSchema.Tables["t1"])
 			assert.Equal(t, tc.expectedIssues, res.SchemaIssues["t1"])
 		}
 	}
@@ -544,7 +548,7 @@ func TestApplyRule(t *testing.T) {
 		}
 
 		if tc.statusCode == http.StatusOK {
-			assert.Equal(t, tc.expectedSchema, res.SpSchema["t1"])
+			assert.Equal(t, tc.expectedSchema, res.SpSchema.Tables["t1"])
 			assert.Equal(t, tc.expectedIssues, res.SchemaIssues["t1"])
 		}
 	}
@@ -563,16 +567,17 @@ func TestDropRule(t *testing.T) {
 			ruleId:     "r101",
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
-							{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
-							{Name: "idx3", Id: "i3", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}},
-						},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
+								{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
+								{Name: "idx3", Id: "i3", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}},
+							},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
@@ -588,15 +593,16 @@ func TestDropRule(t *testing.T) {
 				}},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
-							{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
-						},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
+								{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
+							},
+						}}},
 			},
 		},
 		{
@@ -620,19 +626,20 @@ func TestDropRule(t *testing.T) {
 						Id:          "t1",
 					},
 				},
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+							Id:          "t1",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-						Id:          "t1",
-					},
-				},
+					}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_MIGRATION_TYPE_UNSPECIFIED.Enum(),
 				},
@@ -667,36 +674,38 @@ func TestDropRule(t *testing.T) {
 						Id:          "t1",
 					},
 				},
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "table1",
-						ColIds: []string{"c1", "c2", "c3"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
-							"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "table1",
+							ColIds: []string{"c1", "c2", "c3"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.Int64}, NotNull: true},
+								"c3": {Name: "c", Id: "c3", T: ddl.Type{Name: ddl.String, Len: ddl.MaxLength}, NotNull: true},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
+							Id:          "t1",
 						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1", Desc: false}},
-						Id:          "t1",
 					},
-				},
-			},
+				}},
 		},
 		{
 			name:       "drop rule with an invalid rule-id",
 			ruleId:     "ABC",
 			statusCode: http.StatusBadRequest,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
-							{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
-							{Name: "idx3", Id: "i3", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}},
-						},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
+								{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
+								{Name: "idx3", Id: "i3", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c2", Desc: false, Order: 1}}},
+							},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
@@ -717,15 +726,16 @@ func TestDropRule(t *testing.T) {
 			ruleId:     "r101",
 			statusCode: http.StatusOK,
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
-							{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
-						},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
+								{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
+							},
+						}}},
 				Audit: internal.Audit{
 					MigrationType: migration.MigrationData_SCHEMA_ONLY.Enum(),
 				},
@@ -741,15 +751,16 @@ func TestDropRule(t *testing.T) {
 				}},
 			},
 			expectedConv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name: "table1",
-						Id:   "t1",
-						Indexes: []ddl.CreateIndex{
-							{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
-							{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
-						},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name: "table1",
+							Id:   "t1",
+							Indexes: []ddl.CreateIndex{
+								{Name: "idx1", Id: "i1", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c1", Desc: false}}},
+								{Name: "idx2", Id: "i2", TableId: "t1", Unique: false, Keys: []ddl.IndexKey{{ColId: "c3", Desc: false}, {ColId: "c4", Desc: false}}},
+							},
+						}}},
 			},
 		},
 	}

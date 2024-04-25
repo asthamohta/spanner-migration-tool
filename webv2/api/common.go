@@ -14,7 +14,7 @@ func dropSecondaryIndexHelper(tableId, idxId string) error {
 		return fmt.Errorf("Table id or index id is empty")
 	}
 	sessionState := session.GetSessionState()
-	sp := sessionState.Conv.SpSchema[tableId]
+	sp := sessionState.Conv.SpSchema.Tables[tableId]
 	position := -1
 	for i, index := range sp.Indexes {
 		if idxId == index.Id {
@@ -31,7 +31,7 @@ func dropSecondaryIndexHelper(tableId, idxId string) error {
 	index.RemoveIndexIssues(tableId, sp.Indexes[position])
 
 	sp.Indexes = utilities.RemoveSecondaryIndex(sp.Indexes, position)
-	sessionState.Conv.SpSchema[tableId] = sp
+	sessionState.Conv.SpSchema.Tables[tableId] = sp
 	session.UpdateSessionFile()
 	return nil
 }

@@ -524,9 +524,9 @@ func ReadSpannerSchema(ctx context.Context, conv *internal.Conv, client *sp.Clie
 	for tableName, parentName := range parentTables {
 		tableId, _ := internal.GetTableIdFromSpName(conv.SpSchema, tableName)
 		parentTableId, _ := internal.GetTableIdFromSpName(conv.SpSchema, parentName)
-		spTable := conv.SpSchema[tableId]
+		spTable := conv.SpSchema.Tables[tableId]
 		spTable.ParentId = parentTableId
-		conv.SpSchema[tableId] = spTable
+		conv.SpSchema.Tables[tableId] = spTable
 	}
 	return nil
 }
@@ -536,14 +536,14 @@ func CompareSchema(sessionFileConv, actualSpannerConv *internal.Conv) error {
 	if sessionFileConv.SpDialect != actualSpannerConv.SpDialect {
 		return fmt.Errorf("spanner dialect don't match: session dialect %v, spanner dialect %v", sessionFileConv.SpDialect, actualSpannerConv.SpDialect)
 	}
-	for _, sessionTable := range sessionFileConv.SpSchema {
+	for _, sessionTable := range sessionFileConv.SpSchema.Tables {
 		spannerTableId, err := internal.GetTableIdFromSpName(actualSpannerConv.SpSchema, sessionTable.Name)
 		if err != nil {
 			return fmt.Errorf("table %v not found in the spanner database schema but found in the session file. If this table does not need to be migrated, please exclude it during the schema conversion and migration process", sessionTable.Name)
 		}
-		spannerTable := actualSpannerConv.SpSchema[spannerTableId]
-		sessionTableParentName := sessionFileConv.SpSchema[sessionTable.ParentId].Name
-		spannerTableParentName := actualSpannerConv.SpSchema[spannerTable.ParentId].Name
+		spannerTable := actualSpannerConv.SpSchema.Tables[spannerTableId]
+		sessionTableParentName := sessionFileConv.SpSchema.Tables[sessionTable.ParentId].Name
+		spannerTableParentName := actualSpannerConv.SpSchema.Tables[spannerTable.ParentId].Name
 
 		//table names should match
 		if sessionTable.Name != spannerTable.Name {

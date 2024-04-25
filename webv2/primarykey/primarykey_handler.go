@@ -139,10 +139,10 @@ func UpdatePrimaryKeyAndSessionFile(pkRequest PrimaryKeyRequest) {
 		spannerTable.ColIds = colIds
 	}
 
-	//update spannerTable into sessionState.Conv.SpSchema.
-	for _, table := range sessionState.Conv.SpSchema {
+	//update spannerTable into sessionState.Conv.SpSchema.Tables.
+	for _, table := range sessionState.Conv.SpSchema.Tables {
 		if pkRequest.TableId == table.Id {
-			sessionState.Conv.SpSchema[table.Id] = spannerTable
+			sessionState.Conv.SpSchema.Tables[table.Id] = spannerTable
 			for _, ind := range spannerTable.Indexes {
 				index.RemoveIndexIssues(spannerTable.Id, ind)
 			}

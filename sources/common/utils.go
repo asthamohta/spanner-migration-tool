@@ -58,7 +58,7 @@ func GetColsAndSchemas(conv *internal.Conv, tableId string) (schema.Table, strin
 		srcCols = append(srcCols, srcSchema.ColDefs[colId].Name)
 	}
 	spCols, err2 := internal.GetSpannerCols(conv, tableId, srcCols)
-	spSchema, ok := conv.SpSchema[tableId]
+	spSchema, ok := conv.SpSchema.Tables[tableId]
 	var err error
 	if err1 != nil || err2 != nil || !ok {
 		err = fmt.Errorf(fmt.Sprintf("err1=%s, err2=%s, ok=%t", err1, err2, ok))
@@ -128,7 +128,7 @@ func GetCommonColumnIds(conv *internal.Conv, tableId string, colIds []string) []
 }
 
 func PrepareColumns(conv *internal.Conv, tableId string, srcCols []string) ([]string, error) {
-	spColIds := conv.SpSchema[tableId].ColIds
+	spColIds := conv.SpSchema.Tables[tableId].ColIds
 	srcColIds := []string{}
 	for _, colName := range srcCols {
 		colId, err := internal.GetColIdFromSrcName(conv.SrcSchema[tableId].ColDefs, colName)
@@ -276,8 +276,8 @@ func ComputeNonKeyColumnSize(conv *internal.Conv, tableId string) {
 	totalNonKeyColumnSize := 0
 	tableLevelIssues := conv.SchemaIssues[tableId].TableLevelIssues
 	tableLevelIssues = removeSchemaIssue(tableLevelIssues, internal.RowLimitExceeded)
-	for _, colDef := range conv.SpSchema[tableId].ColDefs {
-		if !checkIfColumnIsPartOfSpSchemaPK(colDef.Id, conv.SpSchema[tableId].PrimaryKeys) {
+	for _, colDef := range conv.SpSchema.Tables[tableId].ColDefs {
+		if !checkIfColumnIsPartOfSpSchemaPK(colDef.Id, conv.SpSchema.Tables[tableId].PrimaryKeys) {
 			totalNonKeyColumnSize += getColumnSize(colDef.T.Name, colDef.T.Len)
 		}
 	}

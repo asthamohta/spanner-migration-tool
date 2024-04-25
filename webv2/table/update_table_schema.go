@@ -92,7 +92,7 @@ func UpdateTableSchema(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		if v.Rename != "" && v.Rename != conv.SpSchema[tableId].ColDefs[colId].Name {
+		if v.Rename != "" && v.Rename != conv.SpSchema.Tables[tableId].ColDefs[colId].Name {
 
 			renameColumn(v.Rename, tableId, colId, conv)
 		}
@@ -124,7 +124,7 @@ func UpdateTableSchema(w http.ResponseWriter, r *http.Request) {
 
 	common.ComputeNonKeyColumnSize(conv, tableId)
 
-	delete(conv.SpSchema[tableId].ColDefs, "")
+	delete(conv.SpSchema.Tables[tableId].ColDefs, "")
 	sessionState.Conv = conv
 
 	session.UpdateSessionFile()

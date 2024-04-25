@@ -36,9 +36,9 @@ type columnDetails struct {
 // addColumn add given column into spannerTable.
 func addColumn(tableId string, colId string, conv *internal.Conv) {
 
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
-	spColName, _ := internal.GetSpannerCol(conv, tableId, colId, conv.SpSchema[tableId].ColDefs)
+	spColName, _ := internal.GetSpannerCol(conv, tableId, colId, conv.SpSchema.Tables[tableId].ColDefs)
 
 	sp.ColDefs[colId] = ddl.ColumnDef{
 		Id:   colId,
@@ -51,7 +51,7 @@ func addColumn(tableId string, colId string, conv *internal.Conv) {
 
 	}
 
-	conv.SpSchema[tableId] = sp
+	conv.SpSchema.Tables[tableId] = sp
 }
 
 func AddNewColumn(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,7 @@ func AddNewColumn(w http.ResponseWriter, r *http.Request) {
 	sessionState := session.GetSessionState()
 	sessionState.Conv.ConvLock.Lock()
 	defer sessionState.Conv.ConvLock.Unlock()
-	for _, c := range sessionState.Conv.SpSchema[tableId].ColDefs {
+	for _, c := range sessionState.Conv.SpSchema.Tables[tableId].ColDefs {
 		if strings.EqualFold(c.Name, details.Name) {
 			http.Error(w, fmt.Sprintf("Multiple columns with similar name cannot exist for column : %v", details.Name), http.StatusBadRequest)
 			return
@@ -85,11 +85,11 @@ func AddNewColumn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Specified name: '%v' is an existing identifier, please use a different column name", details.Name), http.StatusBadRequest)
 		return
 	}
-	ct := sessionState.Conv.SpSchema[tableId]
+	ct := sessionState.Conv.SpSchema.Tables[tableId]
 	columnId := internal.GenerateColumnId()
 	ct.ColIds = append(ct.ColIds, columnId)
 	ct.ColDefs[columnId] = ddl.ColumnDef{Name: details.Name, Id: columnId, T: ddl.Type{Name: details.Datatype, Len: int64(details.Length)}, NotNull: !details.IsNullable}
-	sessionState.Conv.SpSchema[tableId] = ct
+	sessionState.Conv.SpSchema.Tables[tableId] = ct
 	convm := session.ConvWithMetadata{
 		SessionMetadata: sessionState.SessionMetadata,
 		Conv:            *sessionState.Conv,

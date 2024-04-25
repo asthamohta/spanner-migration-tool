@@ -24,7 +24,7 @@ import (
 // getSpannerTable return spannerTable for given TableId.
 func getSpannerTable(sessionState *session.SessionState, pkRequest PrimaryKeyRequest) (spannerTable ddl.CreateTable, found bool) {
 
-	for _, table := range sessionState.Conv.SpSchema {
+	for _, table := range sessionState.Conv.SpSchema.Tables {
 
 		if pkRequest.TableId == table.Id {
 			spannerTable = table
@@ -87,14 +87,14 @@ func RemoveInterleave(conv *internal.Conv, spannertable ddl.CreateTable) {
 				childPkFirstColumn = spannertable.PrimaryKeys[i].ColId
 			}
 		}
-		for i := 0; i < len(conv.SpSchema[spannertable.ParentId].PrimaryKeys); i++ {
-			if conv.SpSchema[spannertable.ParentId].PrimaryKeys[i].Order == 1 {
-				parentPkFirstColumn = conv.SpSchema[spannertable.ParentId].PrimaryKeys[i].ColId
+		for i := 0; i < len(conv.SpSchema.Tables[spannertable.ParentId].PrimaryKeys); i++ {
+			if conv.SpSchema.Tables[spannertable.ParentId].PrimaryKeys[i].Order == 1 {
+				parentPkFirstColumn = conv.SpSchema.Tables[spannertable.ParentId].PrimaryKeys[i].ColId
 			}
 		}
 		if childPkFirstColumn != parentPkFirstColumn {
 			spannertable.ParentId = ""
-			conv.SpSchema[spannertable.Name] = spannertable
+			conv.SpSchema.Tables[spannertable.Name] = spannertable
 		}
 	}
 }

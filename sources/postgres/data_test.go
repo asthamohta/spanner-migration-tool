@@ -302,7 +302,7 @@ func TestConvertData(t *testing.T) {
 
 func buildConv(spTable ddl.CreateTable, srcTable schema.Table) *internal.Conv {
 	conv := internal.MakeConv()
-	conv.SpSchema[spTable.Id] = spTable
+	conv.SpSchema.Tables[spTable.Id] = spTable
 	conv.SrcSchema[srcTable.Id] = srcTable
 	return conv
 }

@@ -22,7 +22,7 @@ import (
 // renameColumn renames given column to newname and update in schema.
 func renameColumn(newName, tableId, colId string, conv *internal.Conv) {
 
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
 	// update interleave table relation.
 	isParent, childTableId := utilities.IsParent(tableId)
@@ -34,8 +34,8 @@ func renameColumn(newName, tableId, colId string, conv *internal.Conv) {
 		}
 	}
 
-	if conv.SpSchema[tableId].ParentId != "" {
-		parentTableId := conv.SpSchema[tableId].ParentId
+	if conv.SpSchema.Tables[tableId].ParentId != "" {
+		parentTableId := conv.SpSchema.Tables[tableId].ParentId
 		parentColId, err := utilities.GetColIdFromSpannerName(conv, parentTableId, sp.ColDefs[colId].Name)
 		if err == nil {
 			renameColumnNameTableSchema(conv, parentTableId, parentColId, newName)
@@ -46,7 +46,7 @@ func renameColumn(newName, tableId, colId string, conv *internal.Conv) {
 
 // renameColumnNameInCurrentTableSchema renames given column in Table Schema.
 func renameColumnNameTableSchema(conv *internal.Conv, tableId string, colId string, newName string) {
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 
 	column, ok := sp.ColDefs[colId]
 
@@ -55,7 +55,7 @@ func renameColumnNameTableSchema(conv *internal.Conv, tableId string, colId stri
 		column.Name = newName
 
 		sp.ColDefs[colId] = column
-		conv.SpSchema[tableId] = sp
+		conv.SpSchema.Tables[tableId] = sp
 
 	}
 }

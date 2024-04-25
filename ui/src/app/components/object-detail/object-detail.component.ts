@@ -474,8 +474,8 @@ export class ObjectDetailComponent implements OnInit {
   checkIfPkColumn(colId: string) {
     let isPkColumn = false
     if (
-      this.conv.SpSchema[this.currentObject!.id].PrimaryKeys != null &&
-      this.conv.SpSchema[this.currentObject!.id].PrimaryKeys.map(
+      this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys != null &&
+      this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys.map(
         (pk: IIndexKey) => pk.ColId
       ).includes(colId)
     ) {
@@ -485,16 +485,16 @@ export class ObjectDetailComponent implements OnInit {
   }
 
   setShardIdColumn() {
-    if (this.conv.SpSchema[this.currentObject!.id] !== undefined) {
-      this.shardIdCol = this.conv.SpSchema[this.currentObject!.id].ShardIdColumn
+    if (this.conv.SpSchema.Tables[this.currentObject!.id] !== undefined) {
+      this.shardIdCol = this.conv.SpSchema.Tables[this.currentObject!.id].ShardIdColumn
     }
 
   }
 
   getAssociatedIndexs(colId: string) {
     let indexes: string[] = []
-    if (this.conv.SpSchema[this.currentObject!.id].Indexes != null) {
-      this.conv.SpSchema[this.currentObject!.id].Indexes.forEach((ind: ICreateIndex) => {
+    if (this.conv.SpSchema.Tables[this.currentObject!.id].Indexes != null) {
+      this.conv.SpSchema.Tables[this.currentObject!.id].Indexes.forEach((ind: ICreateIndex) => {
         if (ind.Keys.map((key) => key.ColId).includes(colId)) {
           indexes.push(ind.Name)
         }
@@ -684,27 +684,27 @@ export class ObjectDetailComponent implements OnInit {
   setPkOrder() {
     if (
       this.currentObject &&
-      this.conv.SpSchema[this.currentObject!.id]?.PrimaryKeys.length == this.pkData.length
+      this.conv.SpSchema.Tables[this.currentObject!.id]?.PrimaryKeys.length == this.pkData.length
     ) {
       this.pkData.forEach((pk: IColumnTabData, i: number) => {
         if (
-          this.pkData[i].spId === this.conv.SpSchema[this.currentObject!.id].PrimaryKeys[i].ColId
+          this.pkData[i].spId === this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys[i].ColId
         ) {
-          this.pkData[i].spOrder = this.conv.SpSchema[this.currentObject!.id].PrimaryKeys[i].Order
+          this.pkData[i].spOrder = this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys[i].Order
         } else {
-          let index = this.conv.SpSchema[this.currentObject!.id].PrimaryKeys.map(
+          let index = this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys.map(
             (item) => item.ColId
           ).indexOf(pk.spId)
-          pk.spOrder = this.conv.SpSchema[this.currentObject!.id].PrimaryKeys[index]?.Order
+          pk.spOrder = this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys[index]?.Order
         }
       })
     } else {
       this.pkData.forEach((pk: IColumnTabData, i: number) => {
-        let index = this.conv.SpSchema[this.currentObject!.id]?.PrimaryKeys.map(
+        let index = this.conv.SpSchema.Tables[this.currentObject!.id]?.PrimaryKeys.map(
           (item) => item.ColId
         ).indexOf(pk.spId)
         if (index !== -1) {
-          pk.spOrder = this.conv.SpSchema[this.currentObject!.id]?.PrimaryKeys[index].Order
+          pk.spOrder = this.conv.SpSchema.Tables[this.currentObject!.id]?.PrimaryKeys[index].Order
         }
       })
     }
@@ -745,17 +745,17 @@ export class ObjectDetailComponent implements OnInit {
   }
 
   getPkRequestObj() {
-    let tableId: string = this.conv.SpSchema[this.currentObject!.id].Id
+    let tableId: string = this.conv.SpSchema.Tables[this.currentObject!.id].Id
     let Columns: { ColId: string; Desc: boolean; Order: number }[] = []
     this.pkData.forEach((row: IColumnTabData) => {
       if (row.spIsPk)
         Columns.push({
           ColId: row.spId,
           Desc:
-            typeof this.conv.SpSchema[this.currentObject!.id].PrimaryKeys.find(
+            typeof this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys.find(
               ({ ColId }) => ColId === row.spId
             ) !== 'undefined'
-              ? this.conv.SpSchema[this.currentObject!.id].PrimaryKeys.find(
+              ? this.conv.SpSchema.Tables[this.currentObject!.id].PrimaryKeys.find(
                 ({ ColId }) => ColId === row.spId
               )!.Desc
               : false,
@@ -806,7 +806,7 @@ export class ObjectDetailComponent implements OnInit {
               'Proceeding the update will remove interleaving between ' +
               this.currentObject?.name +
               ' and ' +
-              this.conv.SpSchema[interleaveTableId].Name +
+              this.conv.SpSchema.Tables[interleaveTableId].Name +
               ' tables.',
             title: 'Confirm Update',
             type: 'warning',
@@ -816,9 +816,9 @@ export class ObjectDetailComponent implements OnInit {
         dialogRef.afterClosed().subscribe((dialogResult) => {
           if (dialogResult) {
             let interleavedChildId: string =
-              this.conv.SpSchema[this.currentObject!.id].ParentId != ''
+              this.conv.SpSchema.Tables[this.currentObject!.id].ParentId != ''
                 ? this.currentObject!.id
-                : this.conv.SpSchema[interleaveTableId].Id
+                : this.conv.SpSchema.Tables[interleaveTableId].Id
             this.data
               .removeInterleave(interleavedChildId)
               .pipe(take(1))
@@ -1066,8 +1066,8 @@ export class ObjectDetailComponent implements OnInit {
     return this.currentObject?.type === ObjectExplorerNodeType.Table &&
       this.currentObject.isSpannerNode &&
       !this.currentObject.isDeleted &&
-      this.conv.SpSchema[this.currentObject.id].ParentId != ''
-      ? this.conv.SpSchema[this.conv.SpSchema[this.currentObject.id].ParentId]?.Name
+      this.conv.SpSchema.Tables[this.currentObject.id].ParentId != ''
+      ? this.conv.SpSchema.Tables[this.conv.SpSchema.Tables[this.currentObject.id].ParentId]?.Name
       : null
   }
 
@@ -1076,11 +1076,11 @@ export class ObjectDetailComponent implements OnInit {
     const addedIndexColumns: string[] = this.localIndexData
       .map((data) => (data.spColName ? data.spColName : ''))
       .filter((name) => name != '')
-    this.indexColumnNames = this.conv.SpSchema[this.currentObject!.parentId]?.ColIds?.filter(
+    this.indexColumnNames = this.conv.SpSchema.Tables[this.currentObject!.parentId]?.ColIds?.filter(
       (colId) => {
         if (
           addedIndexColumns.includes(
-            this.conv.SpSchema[this.currentObject!.parentId]?.ColDefs[colId]?.Name
+            this.conv.SpSchema.Tables[this.currentObject!.parentId]?.ColDefs[colId]?.Name
           )
         ) {
           return false
@@ -1088,7 +1088,7 @@ export class ObjectDetailComponent implements OnInit {
           return true
         }
       }
-    ).map((colId: string) => this.conv.SpSchema[this.currentObject!.parentId]?.ColDefs[colId]?.Name)
+    ).map((colId: string) => this.conv.SpSchema.Tables[this.currentObject!.parentId]?.ColDefs[colId]?.Name)
 
     this.localIndexData.forEach((row: IIndexData) => {
       this.spRowArray.push(
@@ -1332,14 +1332,14 @@ export class ObjectDetailComponent implements OnInit {
   }
 
   tableInterleaveWith(table: string): string {
-    if (this.conv.SpSchema[table].ParentId != '') {
-      return this.conv.SpSchema[table].ParentId
+    if (this.conv.SpSchema.Tables[table].ParentId != '') {
+      return this.conv.SpSchema.Tables[table].ParentId
     }
     let interleaveTable = ''
-    Object.keys(this.conv.SpSchema).forEach((tableName: string) => {
+    Object.keys(this.conv.SpSchema.Tables).forEach((tableName: string) => {
       if (
-        this.conv.SpSchema[tableName].ParentId != '' &&
-        this.conv.SpSchema[tableName].ParentId == table
+        this.conv.SpSchema.Tables[tableName].ParentId != '' &&
+        this.conv.SpSchema.Tables[tableName].ParentId == table
       ) {
         interleaveTable = tableName
       }
@@ -1350,12 +1350,12 @@ export class ObjectDetailComponent implements OnInit {
 
   isPKPrefixModified(tableId: string, interleaveTableId: string): boolean {
     let parentPrimaryKey,childPrimaryKey: IIndexKey[]
-    if (this.conv.SpSchema[tableId].ParentId != interleaveTableId) {
+    if (this.conv.SpSchema.Tables[tableId].ParentId != interleaveTableId) {
       parentPrimaryKey = this.pkObj.Columns
-      childPrimaryKey = this.conv.SpSchema[interleaveTableId].PrimaryKeys
+      childPrimaryKey = this.conv.SpSchema.Tables[interleaveTableId].PrimaryKeys
     } else {
       childPrimaryKey = this.pkObj.Columns
-      parentPrimaryKey = this.conv.SpSchema[interleaveTableId].PrimaryKeys
+      parentPrimaryKey = this.conv.SpSchema.Tables[interleaveTableId].PrimaryKeys
     }
 
     for (let i = 0; i < parentPrimaryKey.length; i++) {

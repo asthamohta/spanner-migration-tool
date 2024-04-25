@@ -20,10 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/GoogleCloudPlatform/spanner-migration-tool/internal"
 	"github.com/GoogleCloudPlatform/spanner-migration-tool/schema"
 	"github.com/GoogleCloudPlatform/spanner-migration-tool/spanner/ddl"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -257,7 +257,7 @@ func TestStripNull(t *testing.T) {
 
 func buildConv(spTable ddl.CreateTable, srcTable schema.Table) *internal.Conv {
 	conv := internal.MakeConv()
-	conv.SpSchema[spTable.Id] = spTable
+	conv.SpSchema.Tables[spTable.Id] = spTable
 	conv.SrcSchema[srcTable.Id] = srcTable
 	return conv
 }

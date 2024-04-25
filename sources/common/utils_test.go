@@ -72,7 +72,7 @@ func TestGetColsAndSchemas(t *testing.T) {
 	}
 
 	conv := internal.MakeConv()
-	conv.SpSchema[spSchema.Id] = spSchema
+	conv.SpSchema.Tables[spSchema.Id] = spSchema
 	conv.SrcSchema[srcSchema.Id] = srcSchema
 
 	type args struct {
@@ -150,16 +150,17 @@ func TestPrepareColumns(t *testing.T) {
 		{
 			name: "when source and spanner tables have same set of columns",
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "t1",
@@ -178,15 +179,16 @@ func TestPrepareColumns(t *testing.T) {
 		{
 			name: "when a column is deleted on spanner table",
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "t1",
@@ -224,16 +226,17 @@ func TestPrepareValues(t *testing.T) {
 		{
 			name: "when source and spanner tables have same set of columns",
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-							"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+								"c2": {Name: "b", Id: "c2", T: ddl.Type{Name: ddl.String, Len: 6}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "t1",
@@ -255,15 +258,16 @@ func TestPrepareValues(t *testing.T) {
 		{
 			name: "when a column is deleted on spanner table",
 			conv: &internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
-					"t1": {
-						Name:   "t1",
-						ColIds: []string{"c1", "c2"},
-						ColDefs: map[string]ddl.ColumnDef{
-							"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
-						},
-						PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
-					}},
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
+						"t1": {
+							Name:   "t1",
+							ColIds: []string{"c1", "c2"},
+							ColDefs: map[string]ddl.ColumnDef{
+								"c1": {Name: "a", Id: "c1", T: ddl.Type{Name: ddl.Int64}},
+							},
+							PrimaryKeys: []ddl.IndexKey{{ColId: "c1"}},
+						}}},
 				SrcSchema: map[string]schema.Table{
 					"t1": {
 						Name:   "t1",

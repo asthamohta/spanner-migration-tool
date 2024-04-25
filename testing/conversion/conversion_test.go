@@ -36,9 +36,9 @@ import (
 	"go.uber.org/zap"
 
 	database "cloud.google.com/go/spanner/admin/database/apiv1"
-	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
-	spanneraccessor "github.com/GoogleCloudPlatform/spanner-migration-tool/accessors/spanner"
 	spanneradmin "github.com/GoogleCloudPlatform/spanner-migration-tool/accessors/clients/spanner/admin"
+	spanneraccessor "github.com/GoogleCloudPlatform/spanner-migration-tool/accessors/spanner"
+	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 )
 
 var (
@@ -127,7 +127,7 @@ func BuildConv(t *testing.T, numCols, numFks int, makeEmpty bool) *internal.Conv
 		foreignKeys = append(foreignKeys, foreignKey)
 	}
 
-	conv.SpSchema["t1"] = ddl.CreateTable{
+	conv.SpSchema.Tables["t1"] = ddl.CreateTable{
 		Name:        "table_a",
 		ColIds:      colIds,
 		ColDefs:     colDefs,
@@ -135,7 +135,7 @@ func BuildConv(t *testing.T, numCols, numFks int, makeEmpty bool) *internal.Conv
 		ForeignKeys: foreignKeys,
 		Id:          "t1",
 	}
-	conv.SpSchema["t2"] = ddl.CreateTable{
+	conv.SpSchema.Tables["t2"] = ddl.CreateTable{
 		Name:        "table_b",
 		ColIds:      colIds,
 		ColDefs:     colDefs,

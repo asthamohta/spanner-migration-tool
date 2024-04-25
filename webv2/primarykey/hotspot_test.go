@@ -37,7 +37,8 @@ func TestDetectHotspot(t *testing.T) {
 			tableId:  "t1",
 			columnId: "c3",
 			conv: internal.Conv{
-				SpSchema: map[string]ddl.CreateTable{
+				SpSchema: ddl.Schema{
+					Tables: map[string]ddl.CreateTable{
 					"t1": {
 						Id:     "t1",
 						ColIds: []string{"c1", "c2", "c3"},
@@ -50,7 +51,7 @@ func TestDetectHotspot(t *testing.T) {
 							{ColId: "c3", Order: 1, Desc: false},
 							{ColId: "c2", Order: 2, Desc: false},
 						},
-					}},
+					}}},
 				SchemaIssues: map[string]internal.TableIssues{
 					"t1": {
 						ColumnLevelIssues: make(map[string][]internal.SchemaIssue),

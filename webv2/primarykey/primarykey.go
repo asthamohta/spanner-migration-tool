@@ -105,7 +105,7 @@ func addPrimaryKey(add []string, pkRequest PrimaryKeyRequest, spannerTable ddl.C
 					if len(schemaissue) > 0 {
 
 						schemaissue = utilities.RemoveSchemaIssues(schemaissue)
-						if pkey.ColId == sessionState.Conv.SpSchema[spannerTable.Id].ShardIdColumn {
+						if pkey.ColId == sessionState.Conv.SpSchema.Tables[spannerTable.Id].ShardIdColumn {
 							schemaissue = utilities.RemoveSchemaIssue(schemaissue, internal.ShardIdColumnPrimaryKey)
 						}
 
@@ -154,7 +154,7 @@ func removePrimaryKey(remove []string, spannerTable ddl.CreateTable) []ddl.Index
 					if len(schemaissue) > 0 {
 
 						schemaissue = utilities.RemoveSchemaIssues(schemaissue)
-						if spannerTable.PrimaryKeys[i].ColId == sessionState.Conv.SpSchema[spannerTable.Id].ShardIdColumn {
+						if spannerTable.PrimaryKeys[i].ColId == sessionState.Conv.SpSchema.Tables[spannerTable.Id].ShardIdColumn {
 							schemaissue = append(schemaissue, internal.ShardIdColumnPrimaryKey)
 						}
 

@@ -31,7 +31,7 @@ import (
 func GetType(conv *internal.Conv, newType, tableId, colId string) (ddl.CreateTable, ddl.Type, error) {
 	sessionState := session.GetSessionState()
 
-	sp := conv.SpSchema[tableId]
+	sp := conv.SpSchema.Tables[tableId]
 	srcCol := conv.SrcSchema[tableId].ColDefs[colId]
 	var ty ddl.Type
 	var issues []internal.SchemaIssue

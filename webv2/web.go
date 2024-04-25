@@ -544,10 +544,10 @@ func getSourceDestinationSummary(w http.ResponseWriter, r *http.Request) {
 	sessionSummary.SourceDatabaseName = sessionState.DbName
 	sessionSummary.ConnectionType = sessionState.SourceDBConnDetails.ConnectionType
 	sessionSummary.SourceTableCount = len(sessionState.Conv.SrcSchema)
-	sessionSummary.SpannerTableCount = len(sessionState.Conv.SpSchema)
+	sessionSummary.SpannerTableCount = len(sessionState.Conv.SpSchema.Tables)
 
 	sourceIndexCount, spannerIndexCount := 0, 0
-	for _, spannerSchema := range sessionState.Conv.SpSchema {
+	for _, spannerSchema := range sessionState.Conv.SpSchema.Tables {
 		spannerIndexCount = spannerIndexCount + len(spannerSchema.Indexes)
 	}
 	for _, sourceSchema := range sessionState.Conv.SrcSchema {

@@ -330,7 +330,7 @@ func addSrcTableToConv(conv *internal.Conv) *internal.Conv {
 func buildConv(spTables []ddl.CreateTable) *internal.Conv {
 	conv := internal.MakeConv()
 	for _, spTable := range spTables {
-		conv.SpSchema[spTable.Id] = spTable
+		conv.SpSchema.Tables[spTable.Id] = spTable
 	}
 	return conv
 }

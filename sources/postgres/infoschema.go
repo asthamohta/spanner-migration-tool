@@ -184,7 +184,7 @@ func (isi InfoSchemaImpl) ProcessData(conv *internal.Conv, tableId string, srcSc
 			conv.CollectBadRow(srcTableName, srcCols, valsToStrings(v))
 			continue
 		}
-		conv.WriteRow(srcTableName, conv.SpSchema[tableId].Name, cvtCols, cvtVals)
+		conv.WriteRow(srcTableName, conv.SpSchema.Tables[tableId].Name, cvtCols, cvtVals)
 	}
 	return nil
 }
@@ -221,7 +221,7 @@ func convertSQLRow(conv *internal.Conv, tableId string, colIds []string, srcSche
 		cs = append(cs, spCd.Name)
 	}
 	if aux, ok := conv.SyntheticPKeys[tableId]; ok {
-		cs = append(cs, conv.SpSchema[tableId].ColDefs[aux.ColId].Name)
+		cs = append(cs, conv.SpSchema.Tables[tableId].ColDefs[aux.ColId].Name)
 		vs = append(vs, fmt.Sprintf("%d", int64(bits.Reverse64(uint64(aux.Sequence)))))
 		aux.Sequence++
 		conv.SyntheticPKeys[tableId] = aux

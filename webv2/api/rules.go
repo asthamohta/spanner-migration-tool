@@ -239,7 +239,7 @@ func setGlobalDataType(typeMap map[string]string) {
 	// other customizations that have been performed via the UI (dropping columns, renaming columns
 	// etc). In particular, note that we can't just blindly redo schema conversion (using an appropriate
 	// version of 'toDDL' with the new typeMap).
-	for tableId, spSchema := range sessionState.Conv.SpSchema {
+	for tableId, spSchema := range sessionState.Conv.SpSchema.Tables {
 		for colId := range spSchema.ColDefs {
 			srcColDef := sessionState.Conv.SrcSchema[tableId].ColDefs[colId]
 			// If the srcCol's type is in the map, then recalculate the Spanner type
@@ -271,7 +271,7 @@ func addIndex(newIndex ddl.CreateIndex) (ddl.CreateIndex, error) {
 	}
 
 	sessionState := session.GetSessionState()
-	sp := sessionState.Conv.SpSchema[newIndex.TableId]
+	sp := sessionState.Conv.SpSchema.Tables[newIndex.TableId]
 
 	newIndexes := []ddl.CreateIndex{newIndex}
 	index.CheckIndexSuggestion(newIndexes, sp)
@@ -281,27 +281,27 @@ func addIndex(newIndex ddl.CreateIndex) (ddl.CreateIndex, error) {
 
 	sessionState.Conv.UsedNames[strings.ToLower(newIndex.Name)] = true
 	sp.Indexes = append(sp.Indexes, newIndexes...)
-	sessionState.Conv.SpSchema[newIndex.TableId] = sp
+	sessionState.Conv.SpSchema.Tables[newIndex.TableId] = sp
 	return newIndexes[0], nil
 }
 
 func setSpColMaxLength(spColMaxLength types.ColMaxLength, associatedObjects string) {
 	sessionState := session.GetSessionState()
 	if associatedObjects == "All table" {
-		for tId := range sessionState.Conv.SpSchema {
-			for _, colDef := range sessionState.Conv.SpSchema[tId].ColDefs {
+		for tId := range sessionState.Conv.SpSchema.Tables {
+			for _, colDef := range sessionState.Conv.SpSchema.Tables[tId].ColDefs {
 				if colDef.T.Name == spColMaxLength.SpDataType {
 					spColDef := colDef
 					if spColDef.T.Len == ddl.MaxLength {
 						spColDef.T.Len, _ = strconv.ParseInt(spColMaxLength.SpColMaxLength, 10, 64)
 					}
-					sessionState.Conv.SpSchema[tId].ColDefs[colDef.Id] = spColDef
+					sessionState.Conv.SpSchema.Tables[tId].ColDefs[colDef.Id] = spColDef
 				}
 			}
 			common.ComputeNonKeyColumnSize(sessionState.Conv, tId)
 		}
 	} else {
-		for _, colDef := range sessionState.Conv.SpSchema[associatedObjects].ColDefs {
+		for _, colDef := range sessionState.Conv.SpSchema.Tables[associatedObjects].ColDefs {
 			if colDef.T.Name == spColMaxLength.SpDataType {
 				spColDef := colDef
 				if spColDef.T.Len == ddl.MaxLength {
@@ -317,8 +317,8 @@ func revertSpColMaxLength(spColMaxLength types.ColMaxLength, associatedObjects s
 	sessionState := session.GetSessionState()
 	spColLen, _ := strconv.ParseInt(spColMaxLength.SpColMaxLength, 10, 64)
 	if associatedObjects == "All tables" {
-		for tId := range sessionState.Conv.SpSchema {
-			for colId, colDef := range sessionState.Conv.SpSchema[tId].ColDefs {
+		for tId := range sessionState.Conv.SpSchema.Tables {
+			for colId, colDef := range sessionState.Conv.SpSchema.Tables[tId].ColDefs {
 				if colDef.T.Name == spColMaxLength.SpDataType {
 					utilities.UpdateMaxColumnLen(sessionState.Conv, spColMaxLength.SpDataType, tId, colId, spColLen)
 				}
@@ -326,7 +326,7 @@ func revertSpColMaxLength(spColMaxLength types.ColMaxLength, associatedObjects s
 			common.ComputeNonKeyColumnSize(sessionState.Conv, tId)
 		}
 	} else {
-		for colId, colDef := range sessionState.Conv.SpSchema[associatedObjects].ColDefs {
+		for colId, colDef := range sessionState.Conv.SpSchema.Tables[associatedObjects].ColDefs {
 			if colDef.T.Name == spColMaxLength.SpDataType {
 				utilities.UpdateMaxColumnLen(sessionState.Conv, spColMaxLength.SpDataType, associatedObjects, colId, spColLen)
 			}
@@ -342,7 +342,7 @@ func revertSpColMaxLength(spColMaxLength types.ColMaxLength, associatedObjects s
 func revertGlobalDataType(typeMap map[string]string) {
 	sessionState := session.GetSessionState()
 
-	for tableId, spSchema := range sessionState.Conv.SpSchema {
+	for tableId, spSchema := range sessionState.Conv.SpSchema.Tables {
 		for colId, colDef := range spSchema.ColDefs {
 			srcColDef, found := sessionState.Conv.SrcSchema[tableId].ColDefs[colId]
 			if !found {
@@ -364,7 +364,7 @@ func revertGlobalDataType(typeMap map[string]string) {
 
 func removeShardIdColumnFromForeignKeys(isAddedAtFirst bool) {
 	sessionState := session.GetSessionState()
-	for tableId, table := range sessionState.Conv.SpSchema {
+	for tableId, table := range sessionState.Conv.SpSchema.Tables {
 		for i, fk := range table.ForeignKeys {
 
 			if isAddedAtFirst {
@@ -374,14 +374,14 @@ func removeShardIdColumnFromForeignKeys(isAddedAtFirst bool) {
 				fk.ColIds = fk.ColIds[:len(fk.ColIds)-1]
 				fk.ReferColumnIds = fk.ReferColumnIds[:len(fk.ReferColumnIds)-1]
 			}
-			sessionState.Conv.SpSchema[tableId].ForeignKeys[i] = fk
+			sessionState.Conv.SpSchema.Tables[tableId].ForeignKeys[i] = fk
 		}
 	}
 }
 
 func revertShardIdColumnAsPrimaryKey(isAddedAtFirst bool) {
 	sessionState := session.GetSessionState()
-	for _, table := range sessionState.Conv.SpSchema {
+	for _, table := range sessionState.Conv.SpSchema.Tables {
 		pkRequest := primarykey.PrimaryKeyRequest{
 			TableId: table.Id,
 			Columns: []ddl.IndexKey{},
@@ -402,7 +402,7 @@ func revertShardIdColumnAsPrimaryKey(isAddedAtFirst bool) {
 
 func checkInterleaving() string {
 	sessionState := session.GetSessionState()
-	for _, spSchema := range sessionState.Conv.SpSchema {
+	for _, spSchema := range sessionState.Conv.SpSchema.Tables {
 		if spSchema.ParentId != "" {
 			return spSchema.Name
 		}

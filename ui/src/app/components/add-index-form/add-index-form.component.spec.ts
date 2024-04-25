@@ -97,10 +97,10 @@ describe('AddIndexFormComponent', () => {
     }
     sidenavServiceSpy.ruleData = of(addIndexRule)
     component.ngOnInit()
-    const columnName = mockIConv.SpSchema[addIndexRule.Data.TableId]?.ColDefs[addIndexRule.Data.Keys[0].ColId].Name;
+    const columnName = mockIConv.SpSchema.Tables[addIndexRule.Data.TableId]?.ColDefs[addIndexRule.Data.Keys[0].ColId].Name;
     expect(component.ColsArray.length).toBe(1);
     expect(component.ColsArray.at(0).value.columnName).toEqual(columnName);
-    expect(component.addIndexForm.controls['tableName'].value).toEqual(mockIConv.SpSchema[addIndexRule.Data.TableId].Name);
+    expect(component.addIndexForm.controls['tableName'].value).toEqual(mockIConv.SpSchema.Tables[addIndexRule.Data.TableId].Name);
     expect(component.addIndexForm.controls['indexName'].value).toEqual(addIndexRule.Data.Name)
     expect(component.addIndexForm.status).toEqual("DISABLED");
   });
@@ -135,7 +135,7 @@ describe('AddIndexFormComponent', () => {
       ],
     };
     component.setColArraysForViewRules(tableId, ruleData.Keys);
-    const columnName = mockIConv.SpSchema[tableId]?.ColDefs[ruleData.Keys[0].ColId].Name;
+    const columnName = mockIConv.SpSchema.Tables[tableId]?.ColDefs[ruleData.Keys[0].ColId].Name;
     expect(component.ColsArray.length).toBe(1);
     expect(component.ColsArray.at(0).value.columnName).toEqual(columnName);
   });
