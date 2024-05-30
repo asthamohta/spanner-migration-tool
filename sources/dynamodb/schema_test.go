@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
+	"github.com/GoogleCloudPlatform/spanner-migration-tool/common/constants"
 	"github.com/GoogleCloudPlatform/spanner-migration-tool/internal"
 	"github.com/GoogleCloudPlatform/spanner-migration-tool/logger"
 	"github.com/GoogleCloudPlatform/spanner-migration-tool/schema"
@@ -189,7 +190,7 @@ func TestProcessSchema(t *testing.T) {
 
 	conv := internal.MakeConv()
 	processSchema := common.ProcessSchemaImpl{}
-	err := processSchema.ProcessSchema(conv, InfoSchemaImpl{client, nil, sampleSize}, 1, internal.AdditionalSchemaAttributes{}, &common.SchemaToSpannerImpl{}, &common.UtilsOrderImpl{}, &common.InfoSchemaImpl{})
+	err := processSchema.ProcessSchema(conv, InfoSchemaImpl{client, nil, sampleSize}, 1, internal.AdditionalSchemaAttributes{}, constants.DYNAMODB, &common.SchemaToSpannerImpl{}, &common.UtilsOrderImpl{}, &common.InfoSchemaImpl{})
 
 	assert.Nil(t, err)
 	expectedSchema := map[string]ddl.CreateTable{
@@ -290,7 +291,7 @@ func TestProcessSchema_FullDataTypes(t *testing.T) {
 
 	conv := internal.MakeConv()
 	processSchema := common.ProcessSchemaImpl{}
-	err := processSchema.ProcessSchema(conv, InfoSchemaImpl{client, nil, sampleSize}, 1, internal.AdditionalSchemaAttributes{}, &common.SchemaToSpannerImpl{}, &common.UtilsOrderImpl{}, &common.InfoSchemaImpl{})
+	err := processSchema.ProcessSchema(conv, InfoSchemaImpl{client, nil, sampleSize}, 1, internal.AdditionalSchemaAttributes{}, constants.DYNAMODB, &common.SchemaToSpannerImpl{}, &common.UtilsOrderImpl{}, &common.InfoSchemaImpl{})
 
 	assert.Nil(t, err)
 	expectedSchema := map[string]ddl.CreateTable{
@@ -709,7 +710,7 @@ func TestInfoSchemaImpl_GetColumns(t *testing.T) {
 
 	isi := InfoSchemaImpl{client, nil, 10}
 
-	colDefs, _, err := isi.GetColumns(conv, dySchema, nil, nil)
+	colDefs, _, err := isi.GetColumns(conv, dySchema, nil, nil, "t1")
 	assert.Nil(t, err)
 	expectColNames := []string{
 		"a", "b",
